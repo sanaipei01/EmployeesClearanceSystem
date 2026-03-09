@@ -1,5 +1,206 @@
 import React, { useState, useEffect } from 'react';
 
+const LIGHT_CSS = `
+  /* ── BODY & LAYOUT ── */
+  body, .layout, .main-content, .content-area {
+    background: #F0F4FF !important;
+    color: #111827 !important;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: #1E2433 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: #FFFFFF !important;
+    border-color: rgba(0,0,0,0.08) !important;
+  }
+  .topbar-page { color: #111827 !important; }
+  .topbar-time { color: #6B7280 !important; }
+
+  /* ── ALL CARDS AND DARK SECTIONS ── */
+  .card,
+  div[style*="#111827"],
+  div[style*="#0A0F1E"],
+  div[style*="#080C14"],
+  div[style*="#0D1220"],
+  div[style*="#1F2937"] {
+    background: #FFFFFF !important;
+    border-color: rgba(0,0,0,0.08) !important;
+    color: #111827 !important;
+  }
+
+  /* ── ALL TEXT ── */
+  div, span, p, h1, h2, h3, h4, td, th, label {
+    color: inherit;
+  }
+
+  /* Force dark text on light background */
+  .content-area div,
+  .content-area span,
+  .content-area p,
+  .content-area td,
+  .content-area th {
+    color: #111827 !important;
+  }
+
+  /* ── MUTED TEXT ── */
+  .content-area [style*="6B7280"],
+  .content-area [style*="9CA3AF"],
+  .content-area [style*="6b7280"],
+  .content-area [style*="9ca3af"] {
+    color: #6B7280 !important;
+  }
+
+  /* ── TABLES ── */
+  table { background: #FFFFFF !important; }
+  th {
+    color: #374151 !important;
+    background: #F9FAFB !important;
+    border-color: rgba(0,0,0,0.08) !important;
+  }
+  td {
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.06) !important;
+  }
+  tr:hover td { background: rgba(0,0,0,0.02) !important; }
+
+  /* ── INPUTS & FORMS ── */
+  input, select, textarea {
+    background: #F9FAFB !important;
+    border-color: rgba(0,0,0,0.12) !important;
+    color: #111827 !important;
+  }
+  input::placeholder, textarea::placeholder { color: #9CA3AF !important; }
+  label { color: #374151 !important; }
+
+  /* ── SECTION TOGGLE BUTTONS ── */
+  button[style*="background:none"],
+  button[style*="background: none"],
+  button[style*="background:transparent"],
+  button[style*="background: transparent"] {
+    color: #111827 !important;
+  }
+
+  /* ── EXPANDABLE SECTION CARDS ── */
+  div[style*="overflow:hidden"][style*="borderRadius:16px"],
+  div[style*="overflow: hidden"][style*="border-radius: 16px"] {
+    background: #FFFFFF !important;
+    border-color: rgba(0,0,0,0.08) !important;
+  }
+
+  /* ── YESTERDAY ACTIVITY ── */
+  div[style*="borderRadius:16px"][style*="padding:20px"],
+  div[style*="border-radius: 16px"][style*="padding: 20px"] {
+    background: #FFFFFF !important;
+    border-color: rgba(0,0,0,0.08) !important;
+    color: #111827 !important;
+  }
+
+  /* ── STAT STRIP ── */
+  div[style*="borderRadius:12px"][style*="textAlign:center"],
+  div[style*="border-radius: 12px"][style*="text-align: center"] {
+    background: #FFFFFF !important;
+    border-color: rgba(0,0,0,0.08) !important;
+  }
+
+  /* ── EMPLOYEE/TEAM ROW CARDS ── */
+  div[style*="borderRadius:14px"],
+  div[style*="border-radius: 14px"] {
+    background: #FFFFFF !important;
+    border-color: rgba(0,0,0,0.08) !important;
+  }
+
+  /* ── MODAL ── */
+  div[style*="rgba(0,0,0,0.7)"] > div,
+  div[style*="rgba(0, 0, 0, 0.7)"] > div {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+  div[style*="rgba(0,0,0,0.7)"] span,
+  div[style*="rgba(0,0,0,0.7)"] div {
+    color: #111827 !important;
+  }
+
+  /* ── MODAL TEXTAREA ── */
+  div[style*="rgba(0,0,0,0.7)"] textarea {
+    background: #F9FAFB !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.12) !important;
+  }
+
+  /* ── BORDERS ── */
+  div[style*="rgba(255,255,255,0.04)"],
+  div[style*="rgba(255,255,255,0.06)"],
+  div[style*="rgba(255,255,255,0.07)"],
+  div[style*="rgba(255,255,255,0.08)"],
+  div[style*="rgba(255,255,255,0.1)"] {
+    border-color: rgba(0,0,0,0.07) !important;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-ghost {
+    background: rgba(0,0,0,0.05) !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.12) !important;
+  }
+  button[style*="rgba(255,255,255,0.05)"] {
+    background: rgba(0,0,0,0.05) !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+
+  /* ── PAGE TITLE & SUBTITLE ── */
+  .page-title    { color: #111827 !important; }
+  .page-subtitle { color: #6B7280 !important; }
+
+  /* ── NOTIFICATION BELL DROPDOWN ── */
+  div[style*="borderRadius:16px"][style*="boxShadow"],
+  div[style*="border-radius: 16px"][style*="box-shadow"] {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+
+  /* ── AI CHATBOT ── */
+  div[style*="borderRadius:20px"][style*="border:1px solid"] {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+
+  /* ── CHATBOT MESSAGES ── */
+  div[style*="rgba(255,255,255,0.06)"][style*="borderRadius"] {
+    background: rgba(0,0,0,0.05) !important;
+    color: #111827 !important;
+  }
+
+  /* ── CHATBOT INPUT ── */
+  div[style*="borderRadius:20px"] input {
+    background: rgba(0,0,0,0.05) !important;
+    color: #111827 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+
+  /* ── QUICK REPLY CHIPS ── */
+  div[style*="flexWrap:wrap"] button {
+    background: rgba(0,0,0,0.04) !important;
+    color: #374151 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+
+  /* ── COLORED ACCENT TEXTS stay colored ── */
+  span[style*="#00D4FF"], span[style*="#00E676"],
+  span[style*="#FF6B35"], span[style*="#FFD600"],
+  span[style*="#FF3D71"], span[style*="#A78BFA"] {
+    color: inherit !important;
+  }
+`;
+
 function ThemeToggle() {
   const [dark, setDark] = useState(true);
 
@@ -9,156 +210,17 @@ function ThemeToggle() {
   }, []);
 
   const applyTheme = (isDark) => {
-    const root = document.documentElement;
-    root.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    document.body.style.background = isDark ? '#0A0F1E' : '#F0F4F8';
-    document.body.style.color      = isDark ? '#F9FAFB' : '#0A0F1E';
+    // Toggle body class
+    document.body.classList.toggle('light-mode', !isDark);
 
-    const style = document.getElementById('ecs-theme-style') || (() => {
-      const s = document.createElement('style');
-      s.id = 'ecs-theme-style';
-      document.head.appendChild(s);
-      return s;
-    })();
-
-    if (!isDark) {
-      style.textContent = `
-        /* ── LAYOUT ── */
-        [data-theme="light"] .layout,
-        [data-theme="light"] .main-content,
-        [data-theme="light"] .content-area { background: #F0F4F8 !important; }
-        [data-theme="light"] .sidebar       { background: #1a1f2e !important; }
-
-        /* ── TOPBAR ── */
-        [data-theme="light"] .topbar        { background: rgba(255,255,255,0.97) !important; border-color: rgba(0,0,0,0.08) !important; }
-        [data-theme="light"] .topbar *      { color: #0A0F1E !important; }
-        [data-theme="light"] .topbar-time   { color: #6B7280 !important; }
-
-        /* ── ALL CARDS & SURFACES ── */
-        [data-theme="light"] .card          { background: #FFFFFF !important; border-color: rgba(0,0,0,0.08) !important; color: #0A0F1E !important; box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important; }
-        [data-theme="light"] .card *        { color: #0A0F1E !important; }
-        [data-theme="light"] .stat-card     { background: #FFFFFF !important; border-color: rgba(0,0,0,0.08) !important; }
-        [data-theme="light"] .stat-label    { color: #6B7280 !important; }
-        [data-theme="light"] .stat-value    { color: #0A0F1E !important; }
-
-        /* ── PAGE TITLES ── */
-        [data-theme="light"] .page-title    { color: #0A0F1E !important; }
-        [data-theme="light"] .page-subtitle { color: #6B7280 !important; }
-
-        /* ── DARK SURFACE OVERRIDES (inline styles) ── */
-        [data-theme="light"] [style*="background:#111827"],
-        [data-theme="light"] [style*="background: #111827"],
-        [data-theme="light"] [style*="background:#0A0F1E"],
-        [data-theme="light"] [style*="background: #0A0F1E"] {
-          background: #FFFFFF !important;
-          border-color: rgba(0,0,0,0.08) !important;
-        }
-
-        /* ── ALL TEXT — force dark on light bg ── */
-        [data-theme="light"] [style*="color:#F9FAFB"],
-        [data-theme="light"] [style*="color: #F9FAFB"],
-        [data-theme="light"] [style*="color:#F0F4FF"],
-        [data-theme="light"] [style*="color: #F0F4FF"] { color: #0A0F1E !important; }
-
-        [data-theme="light"] [style*="color:#9CA3AF"],
-        [data-theme="light"] [style*="color: #9CA3AF"] { color: #4B5563 !important; }
-
-        [data-theme="light"] [style*="color:#6B7280"],
-        [data-theme="light"] [style*="color: #6B7280"] { color: #6B7280 !important; }
-
-        /* ── SECTION EXPAND BUTTONS ── */
-        [data-theme="light"] button[style*="background:none"],
-        [data-theme="light"] button[style*="background: none"] {
-          color: #0A0F1E !important;
-          background: transparent !important;
-        }
-        [data-theme="light"] button[style*="background:none"] span,
-        [data-theme="light"] button[style*="background: none"] span { color: #0A0F1E !important; }
-
-        /* ── TABLES ── */
-        [data-theme="light"] table { color: #0A0F1E !important; background: #FFFFFF !important; }
-        [data-theme="light"] th    { color: #374151 !important; background: #F9FAFB !important; border-color: rgba(0,0,0,0.06) !important; }
-        [data-theme="light"] td    { color: #111827 !important; border-color: rgba(0,0,0,0.05) !important; }
-        [data-theme="light"] tr    { border-color: rgba(0,0,0,0.05) !important; }
-        [data-theme="light"] tr:hover { background: rgba(0,0,0,0.02) !important; }
-
-        /* ── FORMS ── */
-        [data-theme="light"] input,
-        [data-theme="light"] select,
-        [data-theme="light"] textarea {
-          background: #F9FAFB !important;
-          border-color: rgba(0,0,0,0.12) !important;
-          color: #0A0F1E !important;
-        }
-        [data-theme="light"] label { color: #374151 !important; }
-
-        /* ── BUTTONS ── */
-        [data-theme="light"] .btn-ghost {
-          background: rgba(0,0,0,0.05) !important;
-          color: #111827 !important;
-          border-color: rgba(0,0,0,0.12) !important;
-        }
-
-        /* ── TRANSPARENT BACKGROUNDS (activity rows etc) ── */
-        [data-theme="light"] [style*="rgba(255,255,255,0.03)"],
-        [data-theme="light"] [style*="rgba(255,255,255,0.04)"],
-        [data-theme="light"] [style*="rgba(255,255,255,0.05)"],
-        [data-theme="light"] [style*="rgba(255,255,255,0.06)"],
-        [data-theme="light"] [style*="rgba(255,255,255,0.07)"],
-        [data-theme="light"] [style*="rgba(255,255,255,0.08)"],
-        [data-theme="light"] [style*="rgba(255,255,255,0.1)"] {
-          background: rgba(0,0,0,0.03) !important;
-          border-color: rgba(0,0,0,0.07) !important;
-        }
-
-        /* ── MINI STAT STRIP ── */
-        [data-theme="light"] [style*="textAlign:center"][style*="borderRadius:12px"],
-        [data-theme="light"] [style*="text-align:center"][style*="border-radius:12px"] {
-          background: #FFFFFF !important;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-        }
-
-        /* ── FORCE ALL CHILDREN TEXT COLORS ── */
-        [data-theme="light"] .content-area div,
-        [data-theme="light"] .content-area span,
-        [data-theme="light"] .content-area p {
-          color: inherit;
-        }
-
-        /* ── MODAL ── */
-        [data-theme="light"] [style*="background:rgba(0,0,0,0.7)"] > div,
-        [data-theme="light"] [style*="background: rgba(0,0,0,0.7)"] > div {
-          background: #FFFFFF !important;
-          color: #0A0F1E !important;
-        }
-        [data-theme="light"] [style*="background:rgba(0,0,0,0.7)"] > div *,
-        [data-theme="light"] [style*="background: rgba(0,0,0,0.7)"] > div * {
-          color: #0A0F1E !important;
-        }
-
-        /* ── EMPLOYEE ROW CARDS ── */
-        [data-theme="light"] [style*="borderRadius:14px"],
-        [data-theme="light"] [style*="border-radius:14px"],
-        [data-theme="light"] [style*="borderRadius:10px"],
-        [data-theme="light"] [style*="border-radius:10px"] {
-          background: #FFFFFF !important;
-          border-color: rgba(0,0,0,0.08) !important;
-        }
-
-        /* ── YESTERDAY ACTIVITY text ── */
-        [data-theme="light"] [style*="fontSize:13px"],
-        [data-theme="light"] [style*="font-size:13px"] { color: #111827 !important; }
-        [data-theme="light"] [style*="fontSize:11px"],
-        [data-theme="light"] [style*="font-size:11px"] { color: #6B7280 !important; }
-
-        /* ── CHATBOT ── */
-        [data-theme="light"] [style*="background:#111827"][style*="borderRadius:20px"] {
-          background: #FFFFFF !important; color: #0A0F1E !important;
-        }
-      `;
-    } else {
-      style.textContent = '';
+    // Inject/remove override stylesheet
+    let el = document.getElementById('ecs-theme-override');
+    if (!el) {
+      el = document.createElement('style');
+      el.id = 'ecs-theme-override';
+      document.head.appendChild(el);
     }
+    el.textContent = isDark ? '' : LIGHT_CSS;
   };
 
   const toggle = () => {
