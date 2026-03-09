@@ -4,6 +4,7 @@ const mysql    = require('mysql2/promise');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
 require('dotenv').config();
+const email = require('./emailService');
 
 const app  = express();
 app.use(cors());
@@ -134,6 +135,25 @@ app.post('/api/requests', authMiddleware, async (req, res) => {
       VALUES (?, ?, ?, ?, ?)
     `, [requestNo, employeeId, type, reason, urgency || 'normal']);
 
+    // Send emails (non-blocking)
+    try {
+      const [empData] = await db.query(`
+        SELECT e.*, u.name, u.username FROM employees e
+        JOIN users u ON e.user_id = u.id WHERE e.id = ?
+      `, [employeeId]);
+      const empEmail = empData[0]?.email || '';
+      const empName  = empData[0]?.name  || 'Employee';
+
+      // Email to employee confirming submission
+      if (empEmail) email.sendRequestSubmitted(empEmail, empName, type, requestNo);
+
+      // Email to HR about new request
+      const HR_EMAIL = process.env.HR_EMAIL || '';
+      if (HR_EMAIL) email.sendNewRequestToHR(HR_EMAIL, empName, type, requestNo, urgency || 'normal');
+    } catch (emailErr) {
+      console.error('Email error (non-fatal):', emailErr.message);
+    }
+
     res.json({ message: 'Request submitted successfully', request_no: requestNo });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -149,6 +169,29 @@ app.patch('/api/requests/:id/status', authMiddleware, async (req, res) => {
       SET status = ?, reviewed_by = ?, review_note = ?
       WHERE id = ?
     `, [status, req.user.id, review_note || '', req.params.id]);
+    // Send email notification to employee
+    try {
+      const [reqData] = await db.query(`
+        SELECT cr.*, e.email, u.name, u.username
+        FROM clearance_requests cr
+        JOIN employees e ON cr.employee_id = e.id
+        JOIN users u ON e.user_id = u.id
+        WHERE cr.id = ?
+      `, [req.params.id]);
+      if (reqData.length > 0) {
+        const r = reqData[0];
+        if (r.email) {
+          if (status === 'approved') {
+            email.sendRequestApproved(r.email, r.name, r.type, r.request_no);
+          } else if (status === 'rejected') {
+            email.sendRequestRejected(r.email, r.name, r.type, r.request_no, review_note);
+          }
+        }
+      }
+    } catch (emailErr) {
+      console.error('Email error (non-fatal):', emailErr.message);
+    }
+
     res.json({ message: `Request ${status} successfully` });
   } catch (err) {
     res.status(500).json({ error: err.message });

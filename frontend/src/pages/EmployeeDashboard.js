@@ -26,6 +26,12 @@ const CLEARANCE_TYPES = [
   'Training Clearance','Equipment Return Clearance','Final Exit Clearance',
 ];
 
+const YESTERDAY_ACTIVITY = [
+  { icon:'📋', text:'You submitted a Travel Clearance request', time:'Yesterday 10:32 AM', color:'#00D4FF' },
+  { icon:'✅', text:'Your Leave Clearance was approved by HR', time:'Yesterday 2:15 PM',  color:'#00E676' },
+  { icon:'🔔', text:'Manager reviewed your request',            time:'Yesterday 4:00 PM',  color:'#FFD600' },
+];
+
 function Badge({ status }) {
   const map = { pending:'badge-pending', approved:'badge-approved', rejected:'badge-rejected', processing:'badge-processing' };
   return <span className={`badge ${map[status] || ''}`}>{status}</span>;
@@ -38,16 +44,20 @@ function Notification({ msg, type }) {
 
 function EmployeeDashboard() {
   const user = JSON.parse(localStorage.getItem('ecs_user') || '{}');
-  const [requests, setRequests]   = useState(() => {
-    // Load from localStorage to get latest status updates from Manager/HR
+  const [requests, setRequests]     = useState(() => {
     const stored = JSON.parse(localStorage.getItem('ecs_employee_requests') || '[]');
-    const myRequests = stored.filter(r => r.employee === JSON.parse(localStorage.getItem('ecs_user') || '{}').name);
-    return myRequests.length > 0 ? [...myRequests, ...SAMPLE_REQUESTS] : SAMPLE_REQUESTS;
+    const mine   = stored.filter(r => r.employee === user.name);
+    return mine.length > 0 ? [...mine, ...SAMPLE_REQUESTS] : SAMPLE_REQUESTS;
   });
-  const [form, setForm]           = useState({ type:'', reason:'', urgency:'normal' });
-  const [notif, setNotif]         = useState({ msg:'', type:'' });
-  const [activeTab, setActiveTab] = useState('overview');
+  const [form, setForm]             = useState({ type:'', reason:'', urgency:'normal' });
+  const [notif, setNotif]           = useState({ msg:'', type:'' });
+  const [activeTab, setActiveTab]   = useState('overview');
   const [certRequest, setCertRequest] = useState(null);
+
+  // Overview expanded sections
+  const [showStats, setShowStats]       = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [showQuick, setShowQuick]       = useState(false);
 
   const showNotif = (msg, type='success') => {
     setNotif({ msg, type });
@@ -58,19 +68,16 @@ function EmployeeDashboard() {
     e.preventDefault();
     const newReq = {
       id: `REQ-${Date.now().toString().slice(-5)}`,
-      type: form.type,
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      urgency: form.urgency,
+      type: form.type, reason: form.reason, urgency: form.urgency,
       employee: user.name,
-      note: 'Submitted — awaiting review',
+      date: new Date().toISOString().split('T')[0],
+      status: 'pending', note: 'Submitted — awaiting review',
     };
     setRequests([newReq, ...requests]);
-    // Save to localStorage so Manager and HR can see it
     const stored = JSON.parse(localStorage.getItem('ecs_employee_requests') || '[]');
     localStorage.setItem('ecs_employee_requests', JSON.stringify([newReq, ...stored]));
     setForm({ type:'', reason:'', urgency:'normal' });
-    showNotif('✅ Clearance request submitted! Your manager will review it shortly.');
+    showNotif('✅ Request submitted! Your manager will review it shortly.');
   };
 
   const stats = {
@@ -138,24 +145,18 @@ function EmployeeDashboard() {
                     <td style={{ color:'#9CA3AF' }}>{r.date}</td>
                     <td><Badge status={r.status} /></td>
                     <td>
-                      {r.status === 'approved' ? (
-                        <button className="btn btn-success" style={{ padding:'5px 12px', fontSize:'12px' }} onClick={() => setCertRequest(r)}>
-                          📄 Download
-                        </button>
-                      ) : <span style={{ color:'#9CA3AF', fontSize:'12px' }}>Not available</span>}
+                      {r.status === 'approved'
+                        ? <button className="btn btn-success" style={{ padding:'5px 12px', fontSize:'12px' }} onClick={() => setCertRequest(r)}>📄 Download</button>
+                        : <span style={{ color:'#9CA3AF', fontSize:'12px' }}>Not available</span>}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
-          {/* Certificate Preview */}
           {certRequest && (
             <div style={{ marginTop:'28px' }}>
-              <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'18px', marginBottom:'16px' }}>
-                📄 Clearance Certificate
-              </div>
+              <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'18px', marginBottom:'16px' }}>📄 Clearance Certificate</div>
               <ClearanceCertificate request={certRequest} employee={user} />
             </div>
           )}
@@ -209,19 +210,76 @@ function EmployeeDashboard() {
       );
     }
 
+    // OVERVIEW — yesterday snapshot + expandable sections
     return (
       <div>
+        {/* Welcome */}
         <div className="page-title">Welcome back, {user.name?.split(' ')[0]} 👋</div>
-        <div className="page-subtitle">Here's a summary of your clearance requests</div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:'16px', marginBottom:'28px' }}>
-          <StatCard icon="📋" label="Total Requests"  value={stats.total}      color="#00D4FF" />
-          <StatCard icon="✅" label="Approved"         value={stats.approved}   color="#00E676" />
-          <StatCard icon="⏳" label="Pending"          value={stats.pending}    color="#FFD600" />
-          <StatCard icon="🔄" label="Processing"       value={stats.processing} color="#FF6B35" />
+        <div className="page-subtitle">Here's what happened yesterday</div>
+
+        {/* Yesterday Activity */}
+        <div className="card" style={{ marginBottom:'20px' }}>
+          <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'15px', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px' }}>
+            🕐 Yesterday's Activity
+          </div>
+          {YESTERDAY_ACTIVITY.map((a, i) => (
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'12px 0', borderBottom: i < YESTERDAY_ACTIVITY.length-1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+              <div style={{ width:'38px', height:'38px', borderRadius:'10px', background:`${a.color}15`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'18px', flexShrink:0 }}>{a.icon}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:'13px' }}>{a.text}</div>
+                <div style={{ fontSize:'11px', color:'#6B7280', marginTop:'3px' }}>{a.time}</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div style={{ marginBottom:'24px' }}>
-          <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'16px', marginBottom:'14px' }}>Request Status Tracker</div>
-          {requests.slice(0,3).map(r => <TimelineTracker key={r.id} request={r} />)}
+
+        {/* Expandable Sections */}
+        <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+
+          {/* Stats */}
+          <div className="card" style={{ padding:'0', overflow:'hidden' }}>
+            <button onClick={() => setShowStats(!showStats)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+              <span>📊 My Request Stats</span>
+              <span style={{ transition:'transform 0.3s', transform: showStats ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
+            </button>
+            {showStats && (
+              <div style={{ padding:'0 20px 20px', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:'12px' }}>
+                <StatCard icon="📋" label="Total"      value={stats.total}      color="#00D4FF" />
+                <StatCard icon="✅" label="Approved"   value={stats.approved}   color="#00E676" />
+                <StatCard icon="⏳" label="Pending"    value={stats.pending}    color="#FFD600" />
+                <StatCard icon="🔄" label="Processing" value={stats.processing} color="#FF6B35" />
+              </div>
+            )}
+          </div>
+
+          {/* Timeline */}
+          <div className="card" style={{ padding:'0', overflow:'hidden' }}>
+            <button onClick={() => setShowTimeline(!showTimeline)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+              <span>🗺️ Request Timeline</span>
+              <span style={{ transition:'transform 0.3s', transform: showTimeline ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
+            </button>
+            {showTimeline && (
+              <div style={{ padding:'0 20px 20px' }}>
+                {requests.slice(0,3).map(r => <TimelineTracker key={r.id} request={r} />)}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="card" style={{ padding:'0', overflow:'hidden' }}>
+            <button onClick={() => setShowQuick(!showQuick)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+              <span>⚡ Quick Actions</span>
+              <span style={{ transition:'transform 0.3s', transform: showQuick ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
+            </button>
+            {showQuick && (
+              <div style={{ padding:'0 20px 20px', display:'flex', gap:'10px', flexWrap:'wrap' }}>
+                <button className="btn btn-primary"  onClick={() => setActiveTab('request')}>📋 Submit Request</button>
+                <button className="btn btn-ghost"    onClick={() => setActiveTab('history')}>🕒 View Requests</button>
+                <button className="btn btn-ghost"    onClick={() => setActiveTab('resignation')}>📝 Resign</button>
+                <button className="btn btn-ghost"    onClick={() => setActiveTab('feedback')}>💬 Give Feedback</button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );

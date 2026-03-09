@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
-const DEMO_USERS = [
-  { id: 1, username: 'admin',    password: 'admin123',   role: 'admin',    name: 'System Admin' },
-  { id: 2, username: 'hr',       password: 'hr123',      role: 'hr',       name: 'HR Officer' },
-  { id: 3, username: 'manager',  password: 'manager123', role: 'manager',  name: 'Dept Manager' },
-  { id: 4, username: 'employee', password: 'emp123',     role: 'employee', name: 'John Employee' },
+// Real credentials stored here — change these to your preferred passwords
+const USERS = [
+  { id:1, username:'admin',    password:'REMOVED',    role:'admin',    name:'Kamau Njoroge'   },
+  { id:2, username:'hr',       password:'REMOVED',       role:'hr',       name:'Aisha Mwangi'    },
+  { id:3, username:'manager',  password:'REMOVED',  role:'manager',  name:'Nempiris Kiti'   },
+  { id:4, username:'employee', password:'REMOVED', role:'employee', name:'Soyian Mumbi'    },
 ];
 
 function Login() {
@@ -14,13 +15,20 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
+
+  const redirectByRole = (role) => {
+    const routes = { admin:'/admin', hr:'/hr', manager:'/manager', employee:'/employee' };
+    navigate(routes[role] || '/login');
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    // Try real backend first
     try {
       const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
@@ -34,29 +42,17 @@ function Login() {
         redirectByRole(data.user.role);
         return;
       }
-    } catch (err) {
-      // backend not running, use demo
-    }
+    } catch {}
 
-    const found = DEMO_USERS.find(u => u.username === username && u.password === password);
+    // Fallback to local credentials
+    const found = USERS.find(u => u.username === username && u.password === password);
     if (found) {
       localStorage.setItem('ecs_user', JSON.stringify(found));
       redirectByRole(found.role);
     } else {
-      setError('Invalid username or password');
+      setError('Invalid username or password. Please try again.');
       setLoading(false);
     }
-  };
-
-  const redirectByRole = (role) => {
-    const routes = { admin: '/admin', hr: '/hr', manager: '/manager', employee: '/employee' };
-    navigate(routes[role] || '/login');
-  };
-
-  const fillDemo = (role) => {
-    const u = DEMO_USERS.find(d => d.role === role);
-    setUsername(u.username);
-    setPassword(u.password);
   };
 
   return (
@@ -83,17 +79,25 @@ function Login() {
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
+              autoComplete="username"
             />
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ position:'relative' }}>
             <label>Password</label>
             <input
-              type="password"
+              type={showPass ? 'text' : 'password'}
               placeholder="Enter your password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
+              style={{ paddingRight:'48px' }}
             />
+            <button
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              style={{ position:'absolute', right:'12px', bottom:'12px', background:'none', border:'none', cursor:'pointer', color:'#6B7280', fontSize:'16px' }}
+            >{showPass ? '🙈' : '👁️'}</button>
           </div>
 
           {error && <div className="login-error">⚠ {error}</div>}
@@ -103,15 +107,8 @@ function Login() {
           </button>
         </form>
 
-        <div className="demo-accounts">
-          <p>Quick Demo Login:</p>
-          <div className="demo-btns">
-            {['admin','hr','manager','employee'].map(role => (
-              <button key={role} className="demo-btn" type="button" onClick={() => fillDemo(role)}>
-                {role}
-              </button>
-            ))}
-          </div>
+        <div style={{ marginTop:'20px', textAlign:'center', fontSize:'12px', color:'rgba(255,255,255,0.3)' }}>
+          © {new Date().getFullYear()} Employee Clearance System · 
         </div>
       </div>
     </div>

@@ -208,3 +208,105 @@
   padding: 28px;
   flex: 1;
 }
+
+/* ── MOBILE RESPONSIVE ───────────────────────────────── */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    height: auto;
+    flex-direction: row;
+    padding: 12px 16px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    overflow-x: auto;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    top: auto;
+    z-index: 100;
+    background: rgba(10,15,30,0.98);
+    backdrop-filter: blur(20px);
+  }
+
+  .sidebar-header { display: none; }
+  .sidebar-role-badge { display: none; }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    flex: 1;
+    overflow-x: auto;
+    padding: 0;
+  }
+
+  .nav-item {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px;
+    min-width: 64px;
+    border-left: none !important;
+    border-bottom: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .nav-item.active {
+    border-bottom: 2px solid currentColor !important;
+    border-left: none !important;
+  }
+
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 10px; }
+  .nav-badge { display: none; }
+
+  .sidebar-footer { display: none; }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding-bottom: 90px;
+  }
+
+  .topbar {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .topbar-page { font-size: 18px; }
+  .topbar-time { display: none; }
+
+  .content-area {
+    padding: 16px;
+  }
+
+  /* Stack grids on mobile */
+  .page-title { font-size: 22px !important; }
+  .page-subtitle { font-size: 13px !important; }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+
+  .modal {
+    width: 95vw !important;
+    margin: 0 auto;
+  }
+
+  .modal-overlay {
+    padding: 16px;
+    align-items: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar { padding: 12px; }
+  .content-area { padding: 12px; }
+}

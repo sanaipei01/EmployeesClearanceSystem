@@ -6,6 +6,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import HRDashboard from './pages/HRDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
+import AIChatbot from './components/AIChatbot';
 import './App.css';
 
 function ProtectedRoute({ children, allowedRoles }) {
@@ -18,6 +19,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 function App() {
   return (
     <Router>
+      <AIChatbot />
       <Routes>
         <Route path="/"         element={<Home />} />
         <Route path="/login"    element={<Login />} />

@@ -3,29 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 const ROLES = [
-  { role: 'Admin',    icon: '🛡️', color: '#FF6B35', desc: 'Full system control' },
-  { role: 'HR',       icon: '👔', color: '#00D4FF', desc: 'Approve requests' },
-  { role: 'Manager',  icon: '📌', color: '#FFD600', desc: 'Manage your team' },
-  { role: 'Employee', icon: '👤', color: '#00E676', desc: 'Submit clearances' },
+  { role: 'Admin',    icon: '🛡️', color: '#FF6B35', desc: 'Full system control',  path:'/login' },
+  { role: 'HR',       icon: '👔', color: '#00D4FF', desc: 'Approve requests',      path:'/login' },
+  { role: 'Manager',  icon: '📌', color: '#FFD600', desc: 'Manage your team',      path:'/login' },
+  { role: 'Employee', icon: '👤', color: '#00E676', desc: 'Submit clearances',     path:'/login' },
 ];
 
 const STATS = [
-  { value: '500+', label: 'Employees' },
-  { value: '99%',  label: 'Accuracy' },
-  { value: '24/7', label: 'Uptime' },
-  { value: '4',    label: 'Dashboards' },
+  { value: '4',    label: 'User Roles'    },
+  { value: '6',    label: 'Request Types' },
+  { value: '99%',  label: 'Accuracy'      },
+  { value: '24/7', label: 'Available'     },
 ];
 
 const FEATURES = [
-  { icon: '🛡️', title: 'Secure Login',     desc: 'JWT role-based access',      color: '#00D4FF' },
-  { icon: '⚡', title: 'Fast Clearance',   desc: 'Submit & approve instantly',  color: '#FFD600' },
-  { icon: '📊', title: 'Smart Reports',    desc: 'Analytics & dashboards',      color: '#FF6B35' },
-  { icon: '🔔', title: 'Live Tracking',    desc: 'Track request status',        color: '#00E676' },
-  { icon: '👥', title: 'Team Management',  desc: 'Manage all departments',      color: '#A78BFA' },
-  { icon: '📋', title: 'Multiple Types',   desc: 'All clearance types covered', color: '#FF3D71' },
+  { icon: '🛡️', title: 'Secure Login',    desc: 'JWT role-based access',       color: '#00D4FF' },
+  { icon: '⚡', title: 'Fast Clearance',  desc: 'Submit & approve instantly',   color: '#FFD600' },
+  { icon: '📊', title: 'Live Dashboard',  desc: 'Track everything in real time',color: '#FF6B35' },
+  { icon: '🔔', title: 'Notifications',   desc: 'Email alerts on every action', color: '#00E676' },
+  { icon: '📄', title: 'Certificates',    desc: 'Download clearance letters',   color: '#A78BFA' },
+  { icon: '🤖', title: 'AI Assistant',    desc: 'Get help anytime',             color: '#FF3D71' },
 ];
 
-export default function Home() {
+function Home() {
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
 
@@ -43,17 +43,23 @@ export default function Home() {
         <div className="grid-lines" />
       </div>
 
+      {/* NAV */}
       <nav className="home-nav">
         <div className="nav-brand">
           <div className="nav-logo">ECS</div>
           <span className="nav-title">Employee Clearance System</span>
         </div>
-        <button className="nav-btn" onClick={() => navigate('/login')}>
-          Sign In →
-        </button>
+        <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
+          <a href="mailto:sanaipeitenkes@gmail.com" style={{ color:'#6B7280', fontSize:'13px', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px' }}>
+            <span>📧</span>
+            <span className="nav-email">sanaipeitenkes@gmail.com</span>
+          </a>
+          <button className="nav-btn" onClick={() => navigate('/login')}>Sign In →</button>
+        </div>
       </nav>
 
       <div className="home-body">
+        {/* LEFT */}
         <div className="home-left">
           <div className="hero-tag">
             <span className="tag-dot" /> Clearance System
@@ -65,7 +71,7 @@ export default function Home() {
           </h1>
           <p className="hero-sub">
             A modern platform for submitting, tracking and approving employee
-            clearance requests — fast, secure and transparent.
+            clearance requests — fast, secure and transparent. Built for real organisations.
           </p>
           <div className="stats-row">
             {STATS.map((s, i) => (
@@ -79,9 +85,29 @@ export default function Home() {
             <button className="btn-primary" onClick={() => navigate('/login')}>
               Get Started →
             </button>
+            <a href="mailto:sanaipeitenkes@gmail.com" className="btn-ghost">
+              📧 Contact Us
+            </a>
+          </div>
+
+          {/* Contact info strip */}
+          <div style={{ display:'flex', gap:'20px', marginTop:'24px', flexWrap:'wrap' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'12px', color:'#6B7280' }}>
+              <span>📧</span>
+              <a href="mailto:sanaipeitenkes@gmail.com" style={{ color:'#00D4FF', textDecoration:'none' }}>sanaipeitenkes@gmail.com</a>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'12px', color:'#6B7280' }}>
+              <span>🐙</span>
+              <a href="https://github.com/sanaipei01" target="_blank" rel="noreferrer" style={{ color:'#A78BFA', textDecoration:'none' }}>github.com/sanaipei01</a>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'12px', color:'#6B7280' }}>
+              <span>📍</span>
+              <span>Nairobi, Kenya 🇰🇪</span>
+            </div>
           </div>
         </div>
 
+        {/* RIGHT */}
         <div className="home-right">
           <div className="roles-grid">
             {ROLES.map((r, i) => (
@@ -114,8 +140,13 @@ export default function Home() {
 
       <footer className="home-footer">
         <span>© Employee Clearance System</span>
-        <span>Built with React & Node.js</span>
+        <span>Built by <strong style={{ color:'#00D4FF' }}>Sanaipei Tenkes</strong></span>
+        <span>
+          <a href="mailto:sanaipeitenkes@gmail.com" style={{ color:'#A78BFA', textDecoration:'none' }}>sanaipeitenkes@gmail.com</a>
+        </span>
       </footer>
     </div>
   );
 }
+
+export default Home;
