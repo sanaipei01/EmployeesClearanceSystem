@@ -142,12 +142,12 @@ function EmployeeDashboard() {
                   <tr key={r.id}>
                     <td style={{ fontFamily:'monospace', color:'#00D4FF' }}>{r.id}</td>
                     <td>{r.type}</td>
-                    <td style={{ color:'#9CA3AF' }}>{r.date}</td>
+                    <td style={{ color:'var(--muted)' }}>{r.date}</td>
                     <td><Badge status={r.status} /></td>
                     <td>
                       {r.status === 'approved'
                         ? <button className="btn btn-success" style={{ padding:'5px 12px', fontSize:'12px' }} onClick={() => setCertRequest(r)}>📄 Download</button>
-                        : <span style={{ color:'#9CA3AF', fontSize:'12px' }}>Not available</span>}
+                        : <span style={{ color:'var(--muted)', fontSize:'12px' }}>Not available</span>}
                     </td>
                   </tr>
                 ))}
@@ -186,12 +186,12 @@ function EmployeeDashboard() {
               </div>
               <div>
                 <div style={{ fontSize:'20px', fontWeight:'700', fontFamily:'Syne,sans-serif' }}>{user.name}</div>
-                <div style={{ color:'#9CA3AF', fontSize:'13px', textTransform:'capitalize', marginTop:'4px' }}>{user.role}</div>
+                <div style={{ color:'var(--muted)', fontSize:'13px', textTransform:'capitalize', marginTop:'4px' }}>{user.role}</div>
               </div>
             </div>
             {[['Username',user.username],['Role',user.role],['Employee ID',`EMP-00${user.id||'1'}`]].map(([k,v]) => (
-              <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
-                <span style={{ color:'#9CA3AF', fontSize:'13px' }}>{k}</span>
+              <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'12px 0', borderBottom:'1px solid var(--border)' }}>
+                <span style={{ color:'var(--muted)', fontSize:'13px' }}>{k}</span>
                 <span style={{ fontSize:'13px', textTransform:'capitalize' }}>{v}</span>
               </div>
             ))}
@@ -227,7 +227,7 @@ function EmployeeDashboard() {
               <div style={{ width:'38px', height:'38px', borderRadius:'10px', background:`${a.color}15`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'18px', flexShrink:0 }}>{a.icon}</div>
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:'13px' }}>{a.text}</div>
-                <div style={{ fontSize:'11px', color:'#6B7280', marginTop:'3px' }}>{a.time}</div>
+                <div style={{ fontSize:'11px', color:'var(--muted)', marginTop:'3px' }}>{a.time}</div>
               </div>
             </div>
           ))}
@@ -238,7 +238,7 @@ function EmployeeDashboard() {
 
           {/* Stats */}
           <div className="card" style={{ padding:'0', overflow:'hidden' }}>
-            <button onClick={() => setShowStats(!showStats)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+            <button onClick={() => setShowStats(!showStats)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
               <span>📊 My Request Stats</span>
               <span style={{ transition:'transform 0.3s', transform: showStats ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
             </button>
@@ -254,7 +254,7 @@ function EmployeeDashboard() {
 
           {/* Timeline */}
           <div className="card" style={{ padding:'0', overflow:'hidden' }}>
-            <button onClick={() => setShowTimeline(!showTimeline)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+            <button onClick={() => setShowTimeline(!showTimeline)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
               <span>🗺️ Request Timeline</span>
               <span style={{ transition:'transform 0.3s', transform: showTimeline ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
             </button>
@@ -267,7 +267,7 @@ function EmployeeDashboard() {
 
           {/* Quick Actions */}
           <div className="card" style={{ padding:'0', overflow:'hidden' }}>
-            <button onClick={() => setShowQuick(!showQuick)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+            <button onClick={() => setShowQuick(!showQuick)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
               <span>⚡ Quick Actions</span>
               <span style={{ transition:'transform 0.3s', transform: showQuick ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
             </button>

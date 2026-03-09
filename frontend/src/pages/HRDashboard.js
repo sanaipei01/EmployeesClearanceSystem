@@ -30,10 +30,10 @@ function Badge({ status }) {
 
 function Section({ title, open, onToggle, children, count }) {
   return (
-    <div style={{ background:'#111827', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'16px', overflow:'hidden', marginBottom:'12px' }}>
-      <button onClick={onToggle} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'#F9FAFB', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
+    <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'16px', overflow:'hidden', marginBottom:'12px' }}>
+      <button onClick={onToggle} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
         <span>{title} {count !== undefined && <span style={{ color:'#FFD600', fontSize:'12px' }}>({count})</span>}</span>
-        <span style={{ transition:'transform 0.3s', transform: open ? 'rotate(180deg)' : 'rotate(0)', color:'#6B7280' }}>▼</span>
+        <span style={{ transition:'transform 0.3s', transform: open ? 'rotate(180deg)' : 'rotate(0)', color:'var(--muted)' }}>▼</span>
       </button>
       {open && <div style={{ padding:'4px 20px 20px' }}>{children}</div>}
     </div>
@@ -64,23 +64,23 @@ function HRDashboard() {
   const renderContent = () => {
     if (activeTab === 'requests') return (
       <div>
-        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px' }}>All Requests 📋</div>
-        <div style={{ color:'#6B7280', fontSize:'14px', marginBottom:'24px' }}>Review and manage clearance requests</div>
-        <div style={{ background:'#111827', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'16px', overflow:'hidden' }}>
+        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px', color:'var(--text)' }}>All Requests 📋</div>
+        <div style={{ color:'var(--muted)', fontSize:'14px', marginBottom:'24px' }}>Review and manage clearance requests</div>
+        <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'16px', overflow:'hidden' }}>
           <div style={{ overflowX:'auto' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
-              <thead><tr style={{ borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
-                {['ID','Employee','Type','Urgency','Status','Action'].map(h => <th key={h} style={{ padding:'12px 16px', textAlign:'left', color:'#6B7280', fontWeight:'600', whiteSpace:'nowrap' }}>{h}</th>)}
+              <thead><tr style={{ borderBottom:'1px solid var(--border)' }}>
+                {['ID','Employee','Type','Urgency','Status','Action'].map(h => <th key={h} style={{ padding:'12px 16px', textAlign:'left', color:'var(--muted)', fontWeight:'600', whiteSpace:'nowrap' }}>{h}</th>)}
               </tr></thead>
               <tbody>
                 {requests.map(r => (
-                  <tr key={r.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+                  <tr key={r.id} style={{ borderBottom:'1px solid var(--border)' }}>
                     <td style={{ padding:'12px 16px', color:'#00D4FF', fontFamily:'monospace', fontSize:'12px' }}>{r.request_no}</td>
                     <td style={{ padding:'12px 16px' }}>{r.employee}</td>
-                    <td style={{ padding:'12px 16px', color:'#9CA3AF' }}>{r.type}</td>
+                    <td style={{ padding:'12px 16px', color:'var(--muted)' }}>{r.type}</td>
                     <td style={{ padding:'12px 16px' }}><Badge status={r.urgency} /></td>
                     <td style={{ padding:'12px 16px' }}><Badge status={r.status} /></td>
-                    <td style={{ padding:'12px 16px' }}><button onClick={() => setSelected(r)} style={{ padding:'5px 14px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#F9FAFB', cursor:'pointer', fontSize:'12px' }}>Review</button></td>
+                    <td style={{ padding:'12px 16px' }}><button onClick={() => setSelected(r)} style={{ padding:'5px 14px', borderRadius:'8px', border:'1px solid var(--border)', background:'rgba(255,255,255,0.05)', color:'var(--text)', cursor:'pointer', fontSize:'12px' }}>Review</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -92,8 +92,8 @@ function HRDashboard() {
 
     if (activeTab === 'feedback') return (
       <div>
-        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px' }}>Feedback 💬</div>
-        <div style={{ color:'#6B7280', fontSize:'14px', marginBottom:'24px' }}>Employee feedback and ratings</div>
+        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px', color:'var(--text)' }}>Feedback 💬</div>
+        <div style={{ color:'var(--muted)', fontSize:'14px', marginBottom:'24px' }}>Employee feedback and ratings</div>
         <FeedbackViewer />
       </div>
     );
@@ -101,29 +101,29 @@ function HRDashboard() {
     // OVERVIEW
     return (
       <div>
-        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px' }}>Welcome back, {user.name?.split(' ')[0]} 👋</div>
-        <div style={{ color:'#6B7280', fontSize:'14px', marginBottom:'20px' }}>Here's a quick snapshot of yesterday</div>
+        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px', color:'var(--text)' }}>Welcome back, {user.name?.split(' ')[0]} 👋</div>
+        <div style={{ color:'var(--muted)', fontSize:'14px', marginBottom:'20px' }}>Here's a quick snapshot of yesterday</div>
 
         {/* Mini stat strip */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'10px', marginBottom:'16px' }}>
           {[['📋','Total',stats.total,'#00D4FF'],['⏳','Pending',stats.pending,'#FFD600'],['✅','Approved',stats.approved,'#00E676'],['❌','Rejected',stats.rejected,'#FF3D71']].map(([icon,label,val,color]) => (
-            <div key={label} style={{ background:'#111827', border:`1px solid ${color}25`, borderRadius:'12px', padding:'14px', textAlign:'center' }}>
+            <div key={label} style={{ background:'var(--card-bg)', border:`1px solid ${color}25`, borderRadius:'12px', padding:'14px', textAlign:'center' }}>
               <div style={{ fontSize:'20px', marginBottom:'4px' }}>{icon}</div>
               <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'22px', color }}>{val}</div>
-              <div style={{ fontSize:'11px', color:'#6B7280', marginTop:'2px' }}>{label}</div>
+              <div style={{ fontSize:'11px', color:'var(--muted)', marginTop:'2px' }}>{label}</div>
             </div>
           ))}
         </div>
 
         {/* Yesterday */}
-        <div style={{ background:'#111827', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'16px', padding:'20px', marginBottom:'16px' }}>
-          <div style={{ fontSize:'11px', color:'#6B7280', fontWeight:'700', letterSpacing:'1px', textTransform:'uppercase', marginBottom:'14px' }}>🕐 Yesterday's Activity</div>
+        <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'16px', padding:'20px', marginBottom:'16px' }}>
+          <div style={{ fontSize:'11px', color:'var(--muted)', fontWeight:'700', letterSpacing:'1px', textTransform:'uppercase', marginBottom:'14px' }}>🕐 Yesterday's Activity</div>
           {YESTERDAY.map((a,i) => (
-            <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'10px 0', borderBottom: i < YESTERDAY.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'10px 0', borderBottom: i < YESTERDAY.length-1 ? '1px solid var(--border)' : 'none' }}>
               <div style={{ width:'34px', height:'34px', borderRadius:'10px', background:`${a.color}15`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'15px', flexShrink:0 }}>{a.icon}</div>
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:'13px' }}>{a.text}</div>
-                <div style={{ fontSize:'11px', color:'#6B7280', marginTop:'2px' }}>{a.time}</div>
+                <div style={{ fontSize:'11px', color:'var(--muted)', marginTop:'2px' }}>{a.time}</div>
               </div>
             </div>
           ))}
@@ -133,14 +133,14 @@ function HRDashboard() {
         <Section title="⏳ Pending — Needs Your Review" open={open.pending} onToggle={() => toggle('pending')} count={stats.pending}>
           <div style={{ overflowX:'auto', marginTop:'8px' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
-              <thead><tr style={{ borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
-                {['Employee','Type','Urgency','Action'].map(h => <th key={h} style={{ padding:'10px 12px', textAlign:'left', color:'#6B7280', fontWeight:'600' }}>{h}</th>)}
+              <thead><tr style={{ borderBottom:'1px solid var(--border)' }}>
+                {['Employee','Type','Urgency','Action'].map(h => <th key={h} style={{ padding:'10px 12px', textAlign:'left', color:'var(--muted)', fontWeight:'600' }}>{h}</th>)}
               </tr></thead>
               <tbody>
                 {requests.filter(r => r.status==='pending').map(r => (
-                  <tr key={r.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+                  <tr key={r.id} style={{ borderBottom:'1px solid var(--border)' }}>
                     <td style={{ padding:'10px 12px', fontWeight:'500' }}>{r.employee}</td>
-                    <td style={{ padding:'10px 12px', color:'#9CA3AF', fontSize:'12px' }}>{r.type}</td>
+                    <td style={{ padding:'10px 12px', color:'var(--muted)', fontSize:'12px' }}>{r.type}</td>
                     <td style={{ padding:'10px 12px' }}><Badge status={r.urgency} /></td>
                     <td style={{ padding:'10px 12px' }}><button onClick={() => setSelected(r)} style={{ padding:'4px 14px', borderRadius:'8px', background:'linear-gradient(135deg,#00D4FF,#0055FF)', border:'none', color:'#0A0F1E', fontFamily:'Syne,sans-serif', fontWeight:'700', cursor:'pointer', fontSize:'11px' }}>Review</button></td>
                   </tr>
@@ -154,16 +154,16 @@ function HRDashboard() {
         <Section title="📋 All Requests" open={open.all} onToggle={() => toggle('all')}>
           <div style={{ overflowX:'auto', marginTop:'8px' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
-              <thead><tr style={{ borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
-                {['Employee','Type','Status','Action'].map(h => <th key={h} style={{ padding:'10px 12px', textAlign:'left', color:'#6B7280', fontWeight:'600' }}>{h}</th>)}
+              <thead><tr style={{ borderBottom:'1px solid var(--border)' }}>
+                {['Employee','Type','Status','Action'].map(h => <th key={h} style={{ padding:'10px 12px', textAlign:'left', color:'var(--muted)', fontWeight:'600' }}>{h}</th>)}
               </tr></thead>
               <tbody>
                 {requests.map(r => (
-                  <tr key={r.id} style={{ borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+                  <tr key={r.id} style={{ borderBottom:'1px solid var(--border)' }}>
                     <td style={{ padding:'10px 12px' }}>{r.employee}</td>
-                    <td style={{ padding:'10px 12px', color:'#9CA3AF', fontSize:'12px' }}>{r.type}</td>
+                    <td style={{ padding:'10px 12px', color:'var(--muted)', fontSize:'12px' }}>{r.type}</td>
                     <td style={{ padding:'10px 12px' }}><Badge status={r.status} /></td>
-                    <td style={{ padding:'10px 12px' }}><button onClick={() => setSelected(r)} style={{ padding:'4px 12px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.05)', color:'#F9FAFB', cursor:'pointer', fontSize:'11px' }}>Review</button></td>
+                    <td style={{ padding:'10px 12px' }}><button onClick={() => setSelected(r)} style={{ padding:'4px 12px', borderRadius:'8px', border:'1px solid var(--border)', background:'rgba(255,255,255,0.05)', color:'var(--text)', cursor:'pointer', fontSize:'11px' }}>Review</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -179,21 +179,21 @@ function HRDashboard() {
       {renderContent()}
       {selected && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px' }}>
-          <div style={{ background:'#111827', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth:'460px' }}>
+          <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth:'460px' }}>
             <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'18px', marginBottom:'20px' }}>Review Request</div>
             {[['Request ID', selected.request_no],['Employee', selected.employee],['Type', selected.type],['Urgency', selected.urgency],['Status', selected.status]].map(([k,v]) => (
-              <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'10px 0', borderBottom:'1px solid rgba(255,255,255,0.06)', fontSize:'13px' }}>
-                <span style={{ color:'#6B7280' }}>{k}</span><span style={{ fontWeight:'600' }}>{v}</span>
+              <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'10px 0', borderBottom:'1px solid var(--border)', fontSize:'13px' }}>
+                <span style={{ color:'var(--muted)' }}>{k}</span><span style={{ fontWeight:'600' }}>{v}</span>
               </div>
             ))}
             <div style={{ marginTop:'16px', marginBottom:'16px' }}>
-              <label style={{ fontSize:'12px', color:'#6B7280', display:'block', marginBottom:'6px' }}>REVIEW NOTE</label>
-              <textarea value={note} onChange={e => setNote(e.target.value)} rows={3} placeholder="Add a note..." style={{ width:'100%', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'10px', padding:'10px', color:'#F9FAFB', fontSize:'13px', outline:'none', resize:'none', fontFamily:'DM Sans,sans-serif', boxSizing:'border-box' }} />
+              <label style={{ fontSize:'12px', color:'var(--muted)', display:'block', marginBottom:'6px' }}>REVIEW NOTE</label>
+              <textarea value={note} onChange={e => setNote(e.target.value)} rows={3} placeholder="Add a note..." style={{ width:'100%', background:'rgba(255,255,255,0.05)', border:'1px solid var(--border)', borderRadius:'10px', padding:'10px', color:'var(--text)', fontSize:'13px', outline:'none', resize:'none', fontFamily:'DM Sans,sans-serif', boxSizing:'border-box' }} />
             </div>
             <div style={{ display:'flex', gap:'10px' }}>
               <button onClick={() => handleAction('approved')} style={{ flex:1, padding:'12px', borderRadius:'10px', background:'linear-gradient(135deg,#00E676,#00A854)', border:'none', color:'#0A0F1E', fontFamily:'Syne,sans-serif', fontWeight:'700', cursor:'pointer' }}>✅ Approve</button>
               <button onClick={() => handleAction('rejected')} style={{ flex:1, padding:'12px', borderRadius:'10px', background:'linear-gradient(135deg,#FF3D71,#CC0044)', border:'none', color:'#fff', fontFamily:'Syne,sans-serif', fontWeight:'700', cursor:'pointer' }}>❌ Reject</button>
-              <button onClick={() => setSelected(null)} style={{ padding:'12px 16px', borderRadius:'10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#9CA3AF', cursor:'pointer' }}>Cancel</button>
+              <button onClick={() => setSelected(null)} style={{ padding:'12px 16px', borderRadius:'10px', background:'rgba(255,255,255,0.05)', border:'1px solid var(--border)', color:'var(--muted)', cursor:'pointer' }}>Cancel</button>
             </div>
           </div>
         </div>
