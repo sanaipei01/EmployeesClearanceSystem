@@ -268,6 +268,141 @@ app.get('/api/feedback', authMiddleware, async (req, res) => {
   }
 });
 
+// ─── MIGRATION ENDPOINT (ADD THIS) ────────────────────────────
+// GET /api/migrate - Run this once to set up database tables
+app.get('/api/migrate', async (req, res) => {
+  try {
+    console.log('🔄 Running database migration...');
+    
+    // Create users table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role ENUM('admin', 'hr', 'manager', 'employee') NOT NULL,
+        name VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ Users table created');
+    
+    // Create employees table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS employees (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100),
+        department VARCHAR(100),
+        position VARCHAR(100),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+    console.log('✅ Employees table created');
+    
+    // Create clearance_requests table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS clearance_requests (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        request_no VARCHAR(20) UNIQUE NOT NULL,
+        employee_id INT NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        reason TEXT,
+        urgency ENUM('normal', 'urgent', 'critical') DEFAULT 'normal',
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+        reviewed_by INT,
+        review_note TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (employee_id) REFERENCES employees(id),
+        FOREIGN KEY (reviewed_by) REFERENCES users(id)
+      )
+    `);
+    console.log('✅ Clearance requests table created');
+    
+    // Create feedback table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS feedback (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        submitted_by VARCHAR(100),
+        role VARCHAR(50),
+        category VARCHAR(50),
+        rating INT,
+        comment TEXT,
+        suggestion TEXT,
+        anonymous BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ Feedback table created');
+    
+    // Insert default admin user
+    const adminPassword = await bcrypt.hash('REMOVED', 10);
+    await db.query(`
+      INSERT INTO users (username, password, role, name) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE password = VALUES(password)
+    `, ['admin', adminPassword, 'admin', 'System Administrator']);
+    console.log('✅ Admin user created');
+    
+    // Insert HR user
+    const hrPassword = await bcrypt.hash('REMOVED', 10);
+    await db.query(`
+      INSERT INTO users (username, password, role, name) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE password = VALUES(password)
+    `, ['hr', hrPassword, 'hr', 'HR Manager']);
+    console.log('✅ HR user created');
+    
+    // Insert Manager user
+    const managerPassword = await bcrypt.hash('REMOVED', 10);
+    await db.query(`
+      INSERT INTO users (username, password, role, name) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE password = VALUES(password)
+    `, ['manager', managerPassword, 'manager', 'Department Manager']);
+    console.log('✅ Manager user created');
+    
+    // Insert Employee user
+    const employeePassword = await bcrypt.hash('REMOVED', 10);
+    await db.query(`
+      INSERT INTO users (username, password, role, name) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE password = VALUES(password)
+    `, ['employee', employeePassword, 'employee', 'John Employee']);
+    console.log('✅ Employee user created');
+    
+    // Get user IDs for employee records
+    const [users] = await db.query('SELECT id, username FROM users WHERE username IN (?, ?, ?, ?)', 
+      ['admin', 'hr', 'manager', 'employee']);
+
+    const userIdMap = {};
+    users.forEach(u => { userIdMap[u.username] = u.id; });
+
+    // Insert employee records
+    await db.query(`
+      INSERT INTO employees (user_id, name, email, department, position) VALUES
+      (?, 'System Admin', 'admin@example.com', 'IT', 'Administrator'),
+      (?, 'HR Manager', 'hr@example.com', 'Human Resources', 'HR Manager'),
+      (?, 'Department Manager', 'manager@example.com', 'Engineering', 'Manager'),
+      (?, 'John Employee', 'john@example.com', 'Engineering', 'Developer')
+      ON DUPLICATE KEY UPDATE name = VALUES(name)
+    `, [userIdMap['admin'], userIdMap['hr'], userIdMap['manager'], userIdMap['employee']]);
+    
+    console.log('✅ Sample employees created');
+    console.log('🎉 Database migration complete!');
+    
+    res.json({ 
+      success: true, 
+      message: 'Database migration complete!',
+      users: ['admin', 'hr', 'manager', 'employee']
+    });
+  } catch (error) {
+    console.error('❌ Migration failed:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 // ─── START SERVER ─────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
