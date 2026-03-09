@@ -1,0 +1,35 @@
+﻿services:
+  - type: web
+    name: ecs-backend
+    runtime: node
+    repo: https://github.com/sanaipei01/EmployeesClearanceSystem
+    branch: main
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: DB_HOST
+        value: gateway.eu-west-1.tidbcloud.com
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_USER
+        value: 2U8g2j7iXqXqXYZ.root
+      - key: DB_PASSWORD
+        value: REMOVED
+      - key: DB_NAME
+        value: ecs_db
+      - key: JWT_SECRET
+        value: REMOVED
+      - key: EMAIL_USER
+        value: sanaipeitenkes@gmail.com
+      - key: EMAIL_PASS
+        value: czfq dnnk lfix gyhs
+      - key: HR_EMAIL
+        value: sanaipeitenkes@gmail.com
+      - key: DATABASE_URL
+        value: mysql://2U8g2j7iXqXqXYZ.root:REMOVED@gateway.eu-west-1.tidbcloud.com:4000/ecs_db?ssl-mode=VERIFY_IDENTITY
