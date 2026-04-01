@@ -399,8 +399,8 @@ function EmployeeDayOverview({ onEnter }) {
       <div
         className={`day-overview-root${leaving ? ' leaving' : ''}`}
         style={{
-          position: 'absolute', inset: 0, overflowY: 'auto',
-          background: 'var(--bg, #0d0d0d)', zIndex: 20, padding: '24px 28px',
+          position: 'fixed', inset: 0, overflowY: 'auto',
+          background: 'var(--bg, #0d0d0d)', zIndex: 999, padding: '24px 28px',
         }}
       >
         {/* ── Header ── */}
@@ -425,7 +425,7 @@ function EmployeeDayOverview({ onEnter }) {
         <YesterdayChart visible={visible} />
 
         {/* ── Main grid ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 14 }}>
 
           {/* Today's Timeline */}
           <div className="ov-section-card">

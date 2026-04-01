@@ -225,7 +225,7 @@ function ManagerDayOverview({ onEnter }) {
         .mgr-section { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; }
         .mgr-section-title { font-family:Syne,sans-serif; font-weight:700; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:12px; }
       `}</style>
-      <div className={`mgr-ov-root${leaving ? ' leaving' : ''}`} style={{ position: 'absolute', inset: 0, overflowY: 'auto', background: 'var(--bg,#0d0d0d)', zIndex: 20, padding: '24px 28px' }}>
+      <div className={`mgr-ov-root${leaving ? ' leaving' : ''}`} style={{ position: 'fixed', inset: 0, overflowY: 'auto', background: 'var(--bg,#0d0d0d)', zIndex: 999, padding: '24px 28px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
             <div style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 22 }}>{greeting}, {user.name?.split(' ')[0] || 'Manager'} 👋</div>
@@ -239,7 +239,7 @@ function ManagerDayOverview({ onEnter }) {
           <button className="mgr-enter-btn" onClick={handleEnter}>Enter Dashboard →</button>
         </div>
         <YesterdayChart visible={visible} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 14 }}>
           <div className="mgr-section"><div className="mgr-section-title">🕐 Today's Schedule</div><TodayTimeline /></div>
           <div className="mgr-section">
             <div className="mgr-section-title">🎯 Team Goals</div>

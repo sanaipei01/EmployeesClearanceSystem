@@ -216,7 +216,7 @@ body.light-mode .layout {
   flex-direction: column;
   transition: margin-left 0.25s ease;
   min-height: 100vh;
-  min-width: 0; /* prevents overflow */
+  min-width: 0;
 }
 
 .layout.collapsed .main-content { margin-left: 68px; }
@@ -256,11 +256,14 @@ body.light-mode .layout {
   gap: 10px;
 }
 
+/* ── CONTENT AREA — position:relative is required for the day overview overlay ── */
 .content-area {
   padding: 28px;
   flex: 1;
   color: var(--text);
   min-width: 0;
+  position: relative;
+  overflow: hidden;
 }
 
 /* ── CARDS ───────────────────────────────────────────── */
@@ -396,11 +399,8 @@ tr:hover td { background: var(--hover); }
    ════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
-  .layout {
-    flex-direction: column;
-  }
+  .layout { flex-direction: column; }
 
-  /* ── Bottom tab bar ────────────────────────────────── */
   .sidebar {
     width: 100% !important;
     height: var(--bottom-nav-h) !important;
@@ -419,7 +419,6 @@ tr:hover td { background: var(--hover); }
     z-index: 100;
   }
 
-  /* ── Nav becomes horizontal strip ─────────────────── */
   .sidebar-nav {
     flex-direction: row;
     align-items: stretch;
@@ -433,7 +432,6 @@ tr:hover td { background: var(--hover); }
   }
   .sidebar-nav::-webkit-scrollbar { display: none; }
 
-  /* ── Each tab takes equal space ────────────────────── */
   .nav-item {
     flex: 1;
     flex-direction: column;
@@ -448,9 +446,7 @@ tr:hover td { background: var(--hover); }
     white-space: normal;
   }
 
-  .nav-item:hover {
-    background: var(--hover);
-  }
+  .nav-item:hover { background: var(--hover); }
 
   .nav-item.active {
     border-bottom: 3px solid currentColor !important;
@@ -471,14 +467,12 @@ tr:hover td { background: var(--hover); }
   }
   .nav-badge { display: none !important; }
 
-  /* ── Main content: make room for bottom bar ────────── */
   .main-content {
     margin-left: 0 !important;
     padding-bottom: var(--bottom-nav-h);
     width: 100%;
   }
 
-  /* ── Topbar ────────────────────────────────────────── */
   .topbar {
     padding: 10px 14px;
     flex-wrap: nowrap;
@@ -488,36 +482,28 @@ tr:hover td { background: var(--hover); }
   .topbar-page { font-size: 15px; }
   .topbar-time { display: none; }
 
-  .topbar-actions {
-    gap: 6px;
-    flex-shrink: 0;
-  }
+  .topbar-actions { gap: 6px; flex-shrink: 0; }
 
-  /* ── Content area ──────────────────────────────────── */
   .content-area {
     padding: 14px;
     overflow-x: hidden;
   }
 
-  /* ── Page titles ───────────────────────────────────── */
   .page-title    { font-size: 20px !important; margin-bottom: 4px; }
   .page-subtitle { font-size: 13px !important; margin-bottom: 16px; }
 
-  /* ── Cards ─────────────────────────────────────────── */
   .card {
     padding: 14px;
     border-radius: 12px;
     margin-bottom: 12px;
   }
 
-  /* ── Stats: 2 col ───────────────────────────────────  */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin-bottom: 14px;
   }
 
-  /* ── Tables ─────────────────────────────────────────── */
   table {
     display: block;
     width: 100%;
@@ -527,14 +513,10 @@ tr:hover td { background: var(--hover); }
     font-size: 13px;
   }
 
-  /* ── Forms: prevent iOS zoom ────────────────────────── */
   .form-group input,
   .form-group select,
-  .form-group textarea {
-    font-size: 16px;
-  }
+  .form-group textarea { font-size: 16px; }
 
-  /* ── Buttons ────────────────────────────────────────── */
   .btn { font-size: 13px; padding: 9px 14px; }
 }
 
