@@ -6,6 +6,9 @@ import ResignationForm from '../components/ResignationForm';
 import TimelineTracker from '../components/TimelineTracker';
 import ClearanceCertificate from '../components/ClearanceCertificate';
 
+// ✅ ADD THIS IMPORT
+import EmployeeDayOverview from '../components/dayoverview/EmployeeDayOverview';
+
 const NAV = [
   { key: 'overview',    icon: '🏠', label: 'Overview' },
   { key: 'request',     icon: '📋', label: 'Submit Request' },
@@ -44,17 +47,20 @@ function Notification({ msg, type }) {
 
 function EmployeeDashboard() {
   const user = JSON.parse(localStorage.getItem('ecs_user') || '{}');
-  const [requests, setRequests]     = useState(() => {
+
+  // ✅ ADD THIS — controls whether the day overview shows
+  const [showDayOverview, setShowDayOverview] = useState(true);
+
+  const [requests, setRequests]       = useState(() => {
     const stored = JSON.parse(localStorage.getItem('ecs_employee_requests') || '[]');
     const mine   = stored.filter(r => r.employee === user.name);
     return mine.length > 0 ? [...mine, ...SAMPLE_REQUESTS] : SAMPLE_REQUESTS;
   });
-  const [form, setForm]             = useState({ type:'', reason:'', urgency:'normal' });
-  const [notif, setNotif]           = useState({ msg:'', type:'' });
-  const [activeTab, setActiveTab]   = useState('overview');
+  const [form, setForm]               = useState({ type:'', reason:'', urgency:'normal' });
+  const [notif, setNotif]             = useState({ msg:'', type:'' });
+  const [activeTab, setActiveTab]     = useState('overview');
   const [certRequest, setCertRequest] = useState(null);
 
-  // Overview expanded sections
   const [showStats, setShowStats]       = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [showQuick, setShowQuick]       = useState(false);
@@ -210,14 +216,10 @@ function EmployeeDashboard() {
       );
     }
 
-    // OVERVIEW — yesterday snapshot + expandable sections
     return (
       <div>
-        {/* Welcome */}
         <div className="page-title">Welcome back, {user.name?.split(' ')[0]} 👋</div>
         <div className="page-subtitle">Here's what happened yesterday</div>
-
-        {/* Yesterday Activity */}
         <div className="card" style={{ marginBottom:'20px' }}>
           <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'15px', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px' }}>
             🕐 Yesterday's Activity
@@ -232,11 +234,7 @@ function EmployeeDashboard() {
             </div>
           ))}
         </div>
-
-        {/* Expandable Sections */}
         <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
-
-          {/* Stats */}
           <div className="card" style={{ padding:'0', overflow:'hidden' }}>
             <button onClick={() => setShowStats(!showStats)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
               <span>📊 My Request Stats</span>
@@ -251,8 +249,6 @@ function EmployeeDashboard() {
               </div>
             )}
           </div>
-
-          {/* Timeline */}
           <div className="card" style={{ padding:'0', overflow:'hidden' }}>
             <button onClick={() => setShowTimeline(!showTimeline)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
               <span>🗺️ Request Timeline</span>
@@ -264,8 +260,6 @@ function EmployeeDashboard() {
               </div>
             )}
           </div>
-
-          {/* Quick Actions */}
           <div className="card" style={{ padding:'0', overflow:'hidden' }}>
             <button onClick={() => setShowQuick(!showQuick)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'none', border:'none', color:'var(--text)', cursor:'pointer', fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>
               <span>⚡ Quick Actions</span>
@@ -286,8 +280,15 @@ function EmployeeDashboard() {
   };
 
   return (
-    <DashboardLayout navItems={navWithTab} role="employee" activeTab={activeTab} setActiveTab={setActiveTab}>
+    // ✅ NOTE: position:relative is needed on the parent so the overlay positions correctly
+    <DashboardLayout navItems={navWithTab} role="employee" activeTab={activeTab} setActiveTab={setActiveTab} style={{ position:'relative' }}>
       <Notification msg={notif.msg} type={notif.type} />
+
+      {/* ✅ DAY OVERVIEW OVERLAY — sits on top, dismissed with "Enter Dashboard" button */}
+      {showDayOverview && (
+        <EmployeeDayOverview onEnter={() => setShowDayOverview(false)} />
+      )}
+
       {renderContent()}
     </DashboardLayout>
   );

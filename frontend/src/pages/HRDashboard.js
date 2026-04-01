@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import StatCard from '../components/StatCard';
 import FeedbackViewer from '../components/FeedbackViewer';
+import HRDayOverview from '../components/dayoverview/HRDayOverview';
 
 const SAMPLE = [
   { id:1, request_no:'REQ-001', employee:'Soyian Mumbi',   type:'Resignation Clearance', urgency:'urgent',   status:'pending',    review_note:'' },
@@ -11,16 +12,16 @@ const SAMPLE = [
 ];
 
 const YESTERDAY = [
-  { icon:'📋', text:'4 new requests submitted by employees',   time:'Yesterday 9:00 AM',  color:'#00D4FF' },
+  { icon:'📋', text:'4 new requests submitted by employees',    time:'Yesterday 9:00 AM',  color:'#00D4FF' },
   { icon:'✅', text:'You approved Seela Stacy Leave Clearance', time:'Yesterday 11:00 AM', color:'#00E676' },
-  { icon:'🔄', text:'Kosiom request moved to processing',       time:'Yesterday 2:30 PM',  color:'#FFD600' },
-  { icon:'❌', text:'1 request rejected — missing documents',   time:'Yesterday 4:00 PM',  color:'#FF3D71' },
+  { icon:'🔄', text:'Kosiom request moved to processing',        time:'Yesterday 2:30 PM',  color:'#FFD600' },
+  { icon:'❌', text:'1 request rejected — missing documents',    time:'Yesterday 4:00 PM',  color:'#FF3D71' },
 ];
 
 const NAV = [
-  { key:'overview',  icon:'🏠', label:'Overview'  },
-  { key:'requests',  icon:'📋', label:'All Requests' },
-  { key:'feedback',  icon:'💬', label:'Feedback'  },
+  { key:'overview', icon:'🏠', label:'Overview'     },
+  { key:'requests', icon:'📋', label:'All Requests' },
+  { key:'feedback', icon:'💬', label:'Feedback'     },
 ];
 
 function Badge({ status }) {
@@ -42,11 +43,12 @@ function Section({ title, open, onToggle, children, count }) {
 
 function HRDashboard() {
   const user = JSON.parse(localStorage.getItem('ecs_user') || '{}');
-  const [requests, setRequests] = useState(SAMPLE);
-  const [selected, setSelected] = useState(null);
-  const [note, setNote]         = useState('');
+  const [showDayOverview, setShowDayOverview] = useState(true);
+  const [requests, setRequests]   = useState(SAMPLE);
+  const [selected, setSelected]   = useState(null);
+  const [note, setNote]           = useState('');
   const [activeTab, setActiveTab] = useState('overview');
-  const [open, setOpen] = useState({ stats:false, pending:false, all:false });
+  const [open, setOpen]           = useState({ stats:false, pending:false, all:false });
   const toggle = key => setOpen(p => ({ ...p, [key]: !p[key] }));
 
   const stats = {
@@ -103,8 +105,6 @@ function HRDashboard() {
       <div>
         <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px', color:'var(--text)' }}>Welcome back, {user.name?.split(' ')[0]} 👋</div>
         <div style={{ color:'var(--muted)', fontSize:'14px', marginBottom:'20px' }}>Here's a quick snapshot of yesterday</div>
-
-        {/* Mini stat strip */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'10px', marginBottom:'16px' }}>
           {[['📋','Total',stats.total,'#00D4FF'],['⏳','Pending',stats.pending,'#FFD600'],['✅','Approved',stats.approved,'#00E676'],['❌','Rejected',stats.rejected,'#FF3D71']].map(([icon,label,val,color]) => (
             <div key={label} style={{ background:'var(--card-bg)', border:`1px solid ${color}25`, borderRadius:'12px', padding:'14px', textAlign:'center' }}>
@@ -114,8 +114,6 @@ function HRDashboard() {
             </div>
           ))}
         </div>
-
-        {/* Yesterday */}
         <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'16px', padding:'20px', marginBottom:'16px' }}>
           <div style={{ fontSize:'11px', color:'var(--muted)', fontWeight:'700', letterSpacing:'1px', textTransform:'uppercase', marginBottom:'14px' }}>🕐 Yesterday's Activity</div>
           {YESTERDAY.map((a,i) => (
@@ -128,8 +126,6 @@ function HRDashboard() {
             </div>
           ))}
         </div>
-
-        {/* Expandable: Pending */}
         <Section title="⏳ Pending — Needs Your Review" open={open.pending} onToggle={() => toggle('pending')} count={stats.pending}>
           <div style={{ overflowX:'auto', marginTop:'8px' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
@@ -149,8 +145,6 @@ function HRDashboard() {
             </table>
           </div>
         </Section>
-
-        {/* Expandable: All */}
         <Section title="📋 All Requests" open={open.all} onToggle={() => toggle('all')}>
           <div style={{ overflowX:'auto', marginTop:'8px' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
@@ -176,7 +170,14 @@ function HRDashboard() {
 
   return (
     <DashboardLayout navItems={NAV.map(n => ({ ...n, onClick: () => setActiveTab(n.key) }))} role="hr" activeTab={activeTab} setActiveTab={setActiveTab}>
+
+      {/* ✅ DAY OVERVIEW OVERLAY */}
+      {showDayOverview && (
+        <HRDayOverview onEnter={() => setShowDayOverview(false)} />
+      )}
+
       {renderContent()}
+
       {selected && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px' }}>
           <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth:'460px' }}>

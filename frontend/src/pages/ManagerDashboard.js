@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DashboardLayout from './DashboardLayout';
 import StatCard from '../components/StatCard';
+import ManagerDayOverview from '../components/dayoverview/ManagerDayOverview';
 
 const TEAM_REQUESTS = [
   { id:1, request_no:'REQ-001', employee:'Soyian Mumbi',   type:'Resignation Clearance', urgency:'urgent',  status:'pending',    review_note:'' },
@@ -24,9 +25,9 @@ const TEAM = [
 ];
 
 const NAV = [
-  { key:'overview', icon:'🏠', label:'Overview'    },
+  { key:'overview', icon:'🏠', label:'Overview'      },
   { key:'requests', icon:'📋', label:'Team Requests' },
-  { key:'team',     icon:'👥', label:'My Team'      },
+  { key:'team',     icon:'👥', label:'My Team'       },
 ];
 
 function Badge({ status }) {
@@ -48,11 +49,12 @@ function Section({ title, open, onToggle, children, count }) {
 
 function ManagerDashboard() {
   const user = JSON.parse(localStorage.getItem('ecs_user') || '{}');
-  const [requests, setRequests] = useState(TEAM_REQUESTS);
-  const [selected, setSelected] = useState(null);
-  const [note, setNote]         = useState('');
+  const [showDayOverview, setShowDayOverview] = useState(true);
+  const [requests, setRequests]   = useState(TEAM_REQUESTS);
+  const [selected, setSelected]   = useState(null);
+  const [note, setNote]           = useState('');
   const [activeTab, setActiveTab] = useState('overview');
-  const [open, setOpen] = useState({ pending:false, team:false });
+  const [open, setOpen]           = useState({ pending:false, team:false });
   const toggle = key => setOpen(p => ({ ...p, [key]: !p[key] }));
 
   const stats = {
@@ -118,8 +120,6 @@ function ManagerDashboard() {
       <div>
         <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'800', fontSize:'24px', marginBottom:'4px', color:'var(--text)' }}>Welcome back, {user.name?.split(' ')[0]} 👋</div>
         <div style={{ color:'var(--muted)', fontSize:'14px', marginBottom:'20px' }}>Here's your team's snapshot from yesterday</div>
-
-        {/* Mini stat strip */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'10px', marginBottom:'16px' }}>
           {[['👥','Team',stats.team,'#A78BFA'],['📋','Total',stats.total,'#00D4FF'],['⏳','Pending',stats.pending,'#FFD600'],['✅','Approved',stats.approved,'#00E676']].map(([icon,label,val,color]) => (
             <div key={label} style={{ background:'var(--card-bg)', border:`1px solid ${color}25`, borderRadius:'12px', padding:'14px', textAlign:'center' }}>
@@ -129,8 +129,6 @@ function ManagerDashboard() {
             </div>
           ))}
         </div>
-
-        {/* Yesterday */}
         <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'16px', padding:'20px', marginBottom:'16px' }}>
           <div style={{ fontSize:'11px', color:'var(--muted)', fontWeight:'700', letterSpacing:'1px', textTransform:'uppercase', marginBottom:'14px' }}>🕐 Yesterday's Activity</div>
           {YESTERDAY.map((a,i) => (
@@ -143,8 +141,6 @@ function ManagerDashboard() {
             </div>
           ))}
         </div>
-
-        {/* Expandable: Pending */}
         <Section title="⏳ Pending — Needs Your Approval" open={open.pending} onToggle={() => toggle('pending')} count={stats.pending}>
           <div style={{ overflowX:'auto', marginTop:'8px' }}>
             <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
@@ -164,8 +160,6 @@ function ManagerDashboard() {
             </table>
           </div>
         </Section>
-
-        {/* Expandable: Team */}
         <Section title="👥 My Team Members" open={open.team} onToggle={() => toggle('team')}>
           <div style={{ display:'flex', flexDirection:'column', gap:'8px', marginTop:'8px' }}>
             {TEAM.map((e,i) => (
@@ -186,7 +180,14 @@ function ManagerDashboard() {
 
   return (
     <DashboardLayout navItems={NAV.map(n => ({ ...n, onClick: () => setActiveTab(n.key) }))} role="manager" activeTab={activeTab} setActiveTab={setActiveTab}>
+
+      {/* ✅ DAY OVERVIEW OVERLAY */}
+      {showDayOverview && (
+        <ManagerDayOverview onEnter={() => setShowDayOverview(false)} />
+      )}
+
       {renderContent()}
+
       {selected && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:'20px' }}>
           <div style={{ background:'var(--card-bg)', border:'1px solid var(--border)', borderRadius:'20px', padding:'28px', width:'100%', maxWidth:'460px' }}>
