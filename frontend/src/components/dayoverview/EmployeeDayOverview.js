@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 
 const INITIAL_MESSAGES = [
   { id:1, from:'Maya (HR)',       msg:'Morning! Training at 3pm today.',    me:false, time:'8:42 AM', role:'hr' },
   { id:2, from:'You',             msg:'Thanks, got it in my calendar!',      me:true,  time:'8:45 AM', role:'employee' },
-  { id:3, from:'James (Manager)', msg:'Great work on your last report 👍',   me:false, time:'9:01 AM', role:'manager' },
+  { id:3, from:'James (Manager)', msg:'Great work on your last report ðŸ‘',   me:false, time:'9:01 AM', role:'manager' },
 ];
 const AUTO_REPLIES = [
   { from:'Maya (HR)',       msg:'Also submit your timesheet by EOD.',  role:'hr' },
@@ -53,8 +53,8 @@ function ChatPanel({ accent }) {
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100%', background:'rgba(255,255,255,0.02)', border:`1px solid ${accent}30`, borderRadius:10, overflow:'hidden' }}>
       <div style={{ padding:'6px 10px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center', flexShrink:0 }}>
-        <span style={{ fontSize:11, fontWeight:700, color:accent }}>💬 Team Chat</span>
-        <span style={{ fontSize:10, color:'#00E676' }}>● 3 online</span>
+        <span style={{ fontSize:11, fontWeight:700, color:accent }}>ðŸ’¬ Team Chat</span>
+        <span style={{ fontSize:10, color:'#00E676' }}>â— 3 online</span>
       </div>
       <div style={{ flex:1, overflowY:'auto', padding:'8px', display:'flex', flexDirection:'column', gap:5, minHeight:0 }}>
         {msgs.map(m=>(
@@ -69,7 +69,7 @@ function ChatPanel({ accent }) {
       </div>
       <div style={{ padding:'6px 8px', borderTop:'1px solid rgba(255,255,255,0.06)', display:'flex', gap:6, flexShrink:0 }}>
         <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Type a message..." style={{ flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'5px 8px', fontSize:11, color:'var(--text,#F9FAFB)', outline:'none' }}/>
-        <button onClick={send} style={{ background:accent, border:'none', borderRadius:6, width:28, height:28, cursor:'pointer', color:'#fff', fontSize:12, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>→</button>
+        <button onClick={send} style={{ background:accent, border:'none', borderRadius:6, width:28, height:28, cursor:'pointer', color:'#fff', fontSize:12, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>â†’</button>
       </div>
     </div>
   );
@@ -102,10 +102,10 @@ function EmployeeDayOverview({ onEnter }) {
 
       <div className={`ov-wrap${leave?' out':''}`} style={{ position:'fixed', inset:0, background:'var(--bg,#0A0F1E)', zIndex:999, display:'flex', flexDirection:'column', padding:'12px 18px', gap:10, overflow:'hidden' }}>
 
-        {/* ── HEADER ── */}
+        {/* â”€â”€ HEADER â”€â”€ */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexShrink:0 }}>
           <div>
-            <div style={{ fontFamily:'Syne,sans-serif', fontWeight:800, fontSize:17, color:'var(--text,#F9FAFB)' }}>{greeting}, {user.name?.split(' ')[0]||'there'} 👋</div>
+            <div style={{ fontFamily:'Syne,sans-serif', fontWeight:800, fontSize:17, color:'var(--text,#F9FAFB)' }}>{greeting}, {user.name?.split(' ')[0]||'there'} ðŸ‘‹</div>
             <div style={{ fontSize:11, color:'var(--muted,#9CA3AF)', marginTop:1 }}>{now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
             <div style={{ display:'flex', gap:5, marginTop:4 }}>
               {[{t:'3 meetings',g:true},{t:'2 overdue',g:false},{t:'On track',g:true}].map((b,i)=>(
@@ -116,13 +116,13 @@ function EmployeeDayOverview({ onEnter }) {
             </div>
           </div>
           <button className="ov-enter-btn" onClick={go} style={{ background:`linear-gradient(135deg,${ACCENT},#ff8c5a)`, color:'#fff', boxShadow:`0 4px 14px ${ACCENT}50` }}>
-            Enter Dashboard →
+            Enter Dashboard â†’
           </button>
         </div>
 
-        {/* ── KPI BAR CHART ── */}
+        {/* â”€â”€ KPI BAR CHART â”€â”€ */}
         <div style={{ background:'linear-gradient(135deg,#0d47a1,#1565c0)', borderRadius:10, padding:'10px 14px', flexShrink:0 }}>
-          <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.65)', marginBottom:6, textTransform:'uppercase', letterSpacing:.5 }}>📊 Yesterday's KPIs</div>
+          <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.65)', marginBottom:6, textTransform:'uppercase', letterSpacing:.5 }}>ðŸ“Š Yesterday's KPIs</div>
           <div style={{ display:'flex', alignItems:'flex-end', gap:8, height:52 }}>
             {KPI.map((d,i)=>{
               const h = vis ? Math.round((Math.min(100,(d.value/d.target)*100)/100)*40) : 0;
@@ -137,13 +137,13 @@ function EmployeeDayOverview({ onEnter }) {
           </div>
         </div>
 
-        {/* ── MAIN GRID ── */}
+        {/* â”€â”€ MAIN GRID â”€â”€ */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1.2fr', gap:10, flex:1, minHeight:0 }}>
 
-          {/* COL 1 — Timeline + Goals */}
+          {/* COL 1 â€” Timeline + Goals */}
           <div style={{ display:'flex', flexDirection:'column', gap:8, minHeight:0 }}>
             <div className="ov-section" style={{ flex:1 }}>
-              <div className="ov-sec-title">🕐 Today's Schedule</div>
+              <div className="ov-sec-title">ðŸ• Today's Schedule</div>
               <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
                 {TIMELINE.map((t,i)=>(
                   <div key={i} style={{ display:'flex', alignItems:'center', gap:6, opacity:t.done?.5:1 }}>
@@ -151,13 +151,13 @@ function EmployeeDayOverview({ onEnter }) {
                     <div style={{ width:6, height:6, borderRadius:'50%', flexShrink:0, background:t.done?'#444':t.urgent?ACCENT:'#00D4FF', boxShadow:t.done?'none':`0 0 4px ${t.urgent?ACCENT:'#00D4FF'}` }}/>
                     <span style={{ fontSize:10, flex:1, color:'var(--text,#F9FAFB)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{t.label}</span>
                     {t.urgent && <span style={{ fontSize:8, color:ACCENT, fontWeight:700 }}>!</span>}
-                    {t.done && <span style={{ fontSize:9, color:'#00E676' }}>✓</span>}
+                    {t.done && <span style={{ fontSize:9, color:'#00E676' }}>âœ“</span>}
                   </div>
                 ))}
               </div>
             </div>
             <div className="ov-section" style={{ flex:1 }}>
-              <div className="ov-sec-title">🎯 Goal Progress</div>
+              <div className="ov-sec-title">ðŸŽ¯ Goal Progress</div>
               <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                 {GOALS.map((g,i)=>(
                   <div key={i}>
@@ -174,12 +174,12 @@ function EmployeeDayOverview({ onEnter }) {
             </div>
           </div>
 
-          {/* COL 2 — Summary Cards + Calendar */}
+          {/* COL 2 â€” Summary Cards + Calendar */}
           <div style={{ display:'flex', flexDirection:'column', gap:8, minHeight:0 }}>
             <div className="ov-section">
-              <div className="ov-sec-title">📋 My Requests</div>
+              <div className="ov-sec-title">ðŸ“‹ My Requests</div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
-                {[{icon:'📋',label:'Total',value:'3',color:'#00D4FF'},{icon:'✅',label:'Approved',value:'1',color:'#00E676'},{icon:'⏳',label:'Pending',value:'1',color:'#FFD600'},{icon:'🔄',label:'Review',value:'1',color:ACCENT}].map((s,i)=>(
+                {[{icon:'ðŸ“‹',label:'Total',value:'3',color:'#00D4FF'},{icon:'âœ…',label:'Approved',value:'1',color:'#00E676'},{icon:'â³',label:'Pending',value:'1',color:'#FFD600'},{icon:'ðŸ”„',label:'Review',value:'1',color:ACCENT}].map((s,i)=>(
                   <div key={i} style={{ padding:'7px 5px', borderRadius:8, background:`${s.color}10`, border:`1px solid ${s.color}20`, textAlign:'center' }}>
                     <div style={{ fontSize:13 }}>{s.icon}</div>
                     <div style={{ fontSize:15, fontWeight:800, fontFamily:'Syne,sans-serif', color:s.color }}>{s.value}</div>
@@ -189,7 +189,7 @@ function EmployeeDayOverview({ onEnter }) {
               </div>
             </div>
             <div className="ov-section" style={{ flex:1 }}>
-              <div className="ov-sec-title">📅 {now.toLocaleString('default',{month:'long',year:'numeric'})}</div>
+              <div className="ov-sec-title">ðŸ“… {now.toLocaleString('default',{month:'long',year:'numeric'})}</div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:1, textAlign:'center', marginBottom:3 }}>
                 {days.map(d=><div key={d} style={{ fontSize:8, color:'var(--muted,#9CA3AF)', fontWeight:700 }}>{d}</div>)}
               </div>
@@ -203,7 +203,7 @@ function EmployeeDayOverview({ onEnter }) {
             </div>
           </div>
 
-          {/* COL 3 — Chat */}
+          {/* COL 3 â€” Chat */}
           <div style={{ minHeight:0, overflow:'hidden' }}>
             <ChatPanel accent={ACCENT}/>
           </div>

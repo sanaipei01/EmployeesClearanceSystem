@@ -1,19 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 
 const RESPONSES = {
-  'submit': 'To submit a clearance request:\n1. Click "📋 Submit Request" in the sidebar\n2. Choose your clearance type\n3. Select urgency level\n4. Write your reason\n5. Click Submit!',
-  'status': 'To check your request status:\n1. Click "🕒 My Requests" in the sidebar\n2. You will see a timeline showing where your request is:\n   Submitted → Manager Review → HR Review → Approved',
-  'approve': 'Managers and HR can approve requests:\n1. Go to "Team Requests" or "All Requests"\n2. Click "Review" on any pending request\n3. Click ✅ Approve or ❌ Reject',
-  'resign': 'To submit a resignation clearance:\n1. Click "📝 Resign" in the sidebar\n2. Fill in 4 steps:\n   - Last working date & reason\n   - Handover checklist\n   - Equipment to return\n   - Confirmation',
-  'certificate': 'To get your clearance certificate:\n1. Go to "🕒 My Requests"\n2. Find an APPROVED request\n3. Click "📄 Download" button\n4. Print or save your certificate!',
-  'feedback': 'To give feedback:\n1. Click "💬 Give Feedback" in the sidebar\n2. Choose a category\n3. Give a star rating (1-5)\n4. Write your experience\n5. Submit — HR and Admin will see it',
-  'login': 'Login credentials:\n• Admin: admin / password\n• HR: hr / password\n• Manager: manager / password\n• Employee: employee / password',
+  'submit': 'To submit a clearance request:\n1. Click "ðŸ“‹ Submit Request" in the sidebar\n2. Choose your clearance type\n3. Select urgency level\n4. Write your reason\n5. Click Submit!',
+  'status': 'To check your request status:\n1. Click "ðŸ•’ My Requests" in the sidebar\n2. You will see a timeline showing where your request is:\n   Submitted â†’ Manager Review â†’ HR Review â†’ Approved',
+  'approve': 'Managers and HR can approve requests:\n1. Go to "Team Requests" or "All Requests"\n2. Click "Review" on any pending request\n3. Click âœ… Approve or âŒ Reject',
+  'resign': 'To submit a resignation clearance:\n1. Click "ðŸ“ Resign" in the sidebar\n2. Fill in 4 steps:\n   - Last working date & reason\n   - Handover checklist\n   - Equipment to return\n   - Confirmation',
+  'certificate': 'To get your clearance certificate:\n1. Go to "ðŸ•’ My Requests"\n2. Find an APPROVED request\n3. Click "ðŸ“„ Download" button\n4. Print or save your certificate!',
+  'feedback': 'To give feedback:\n1. Click "ðŸ’¬ Give Feedback" in the sidebar\n2. Choose a category\n3. Give a star rating (1-5)\n4. Write your experience\n5. Submit â€” HR and Admin will see it',
+  'login': 'Login credentials:\nâ€¢ Admin: admin / password\nâ€¢ HR: hr / password\nâ€¢ Manager: manager / password\nâ€¢ Employee: employee / password',
   'password': 'Your login password is: password\n(All accounts use this password when connected to the real database)',
-  'hello': 'Hello! 👋 I am the ECS Assistant. I can help you with:\n• Submitting requests\n• Checking request status\n• Resignation process\n• Downloading certificates\n• Giving feedback\n\nWhat do you need help with?',
-  'help': 'I can help you with:\n• How to submit a request\n• Checking your request status\n• Resignation clearance steps\n• Downloading your certificate\n• How to give feedback\n• Login information\n\nJust type your question! 😊',
+  'hello': 'Hello! ðŸ‘‹ I am the ECS Assistant. I can help you with:\nâ€¢ Submitting requests\nâ€¢ Checking request status\nâ€¢ Resignation process\nâ€¢ Downloading certificates\nâ€¢ Giving feedback\n\nWhat do you need help with?',
+  'help': 'I can help you with:\nâ€¢ How to submit a request\nâ€¢ Checking your request status\nâ€¢ Resignation clearance steps\nâ€¢ Downloading your certificate\nâ€¢ How to give feedback\nâ€¢ Login information\n\nJust type your question! ðŸ˜Š',
   'types': 'Available clearance types:\n1. Resignation Clearance\n2. Travel Clearance\n3. Leave Clearance\n4. Training Clearance\n5. Equipment Return Clearance\n6. Final Exit Clearance',
-  'notification': 'Your notifications are in the 🔔 bell icon at the top right of your dashboard. Click it to see your latest updates!',
-  'default': "I'm not sure about that. Try asking me about:\n• How to submit a request\n• Checking request status\n• Resignation process\n• Your certificate\n• Feedback\n• Login help",
+  'notification': 'Your notifications are in the ðŸ”” bell icon at the top right of your dashboard. Click it to see your latest updates!',
+  'default': "I'm not sure about that. Try asking me about:\nâ€¢ How to submit a request\nâ€¢ Checking request status\nâ€¢ Resignation process\nâ€¢ Your certificate\nâ€¢ Feedback\nâ€¢ Login help",
 };
 
 function getResponse(msg) {
@@ -36,7 +36,7 @@ function getResponse(msg) {
 function AIChatbot() {
   const [open, setOpen]       = useState(false);
   const [messages, setMessages] = useState([
-    { from:'bot', text:'👋 Hi! I am your ECS Assistant. How can I help you today?', time: new Date().toLocaleTimeString('en-KE', { hour:'2-digit', minute:'2-digit' }) }
+    { from:'bot', text:'ðŸ‘‹ Hi! I am your ECS Assistant. How can I help you today?', time: new Date().toLocaleTimeString('en-KE', { hour:'2-digit', minute:'2-digit' }) }
   ]);
   const [input, setInput]     = useState('');
   const [typing, setTyping]   = useState(false);
@@ -91,7 +91,7 @@ function AIChatbot() {
           onMouseEnter={e => e.target.style.transform='scale(1.1)'}
           onMouseLeave={e => e.target.style.transform='scale(1)'}
         >
-          {open ? '✕' : '🤖'}
+          {open ? 'âœ•' : 'ðŸ¤–'}
         </button>
         {unread > 0 && !open && (
           <div style={{
@@ -129,12 +129,12 @@ function AIChatbot() {
               background:'linear-gradient(135deg, #00D4FF, #0055FF)',
               display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px',
               flexShrink:0,
-            }}>🤖</div>
+            }}>ðŸ¤–</div>
             <div>
               <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'14px' }}>ECS Assistant</div>
               <div style={{ fontSize:'11px', color:'#00E676', display:'flex', alignItems:'center', gap:'4px' }}>
                 <span style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#00E676', display:'inline-block' }} />
-                Online — here to help
+                Online â€” here to help
               </div>
             </div>
           </div>
@@ -203,7 +203,7 @@ function AIChatbot() {
                 display:'flex', alignItems:'center', justifyContent:'center',
                 flexShrink:0,
               }}
-            >→</button>
+            >â†’</button>
           </div>
         </div>
       )}

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 const SAMPLE_ACTIVITIES = [
-  { id:1, action:'submitted',  name:'Soyian Mumbi',    type:'Leave Clearance',       time:'2 mins ago',  color:'#00D4FF', icon:'📋' },
-  { id:2, action:'approved',   name:'Kosiom Naikumi',  type:'Travel Clearance',      time:'15 mins ago', color:'#00E676', icon:'✅' },
-  { id:3, action:'rejected',   name:'Seela Stacy',     type:'Equipment Return',      time:'1 hr ago',    color:'#FF3D71', icon:'❌' },
-  { id:4, action:'submitted',  name:'Resian Camila',   type:'Training Clearance',    time:'2 hrs ago',   color:'#00D4FF', icon:'📋' },
-  { id:5, action:'processing', name:'Nempiris Kiti',   type:'Resignation Clearance', time:'3 hrs ago',   color:'#FFD600', icon:'🔄' },
-  { id:6, action:'approved',   name:'Soyian Mumbi',    type:'Final Exit Clearance',  time:'Yesterday',   color:'#00E676', icon:'✅' },
-  { id:7, action:'submitted',  name:'Kosiom Naikumi',  type:'Leave Clearance',       time:'Yesterday',   color:'#00D4FF', icon:'📋' },
+  { id:1, action:'submitted',  name:'Soyian Mumbi',    type:'Leave Clearance',       time:'2 mins ago',  color:'#00D4FF', icon:'ðŸ“‹' },
+  { id:2, action:'approved',   name:'Kosiom Naikumi',  type:'Travel Clearance',      time:'15 mins ago', color:'#00E676', icon:'âœ…' },
+  { id:3, action:'rejected',   name:'Seela Stacy',     type:'Equipment Return',      time:'1 hr ago',    color:'#FF3D71', icon:'âŒ' },
+  { id:4, action:'submitted',  name:'Resian Camila',   type:'Training Clearance',    time:'2 hrs ago',   color:'#00D4FF', icon:'ðŸ“‹' },
+  { id:5, action:'processing', name:'Nempiris Kiti',   type:'Resignation Clearance', time:'3 hrs ago',   color:'#FFD600', icon:'ðŸ”„' },
+  { id:6, action:'approved',   name:'Soyian Mumbi',    type:'Final Exit Clearance',  time:'Yesterday',   color:'#00E676', icon:'âœ…' },
+  { id:7, action:'submitted',  name:'Kosiom Naikumi',  type:'Leave Clearance',       time:'Yesterday',   color:'#00D4FF', icon:'ðŸ“‹' },
 ];
 
 function ActivityFeed() {
@@ -27,7 +27,7 @@ function ActivityFeed() {
     }}>
       <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'10px' }}>
         <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'15px' }}>
-          🕒 Live Activity Feed
+          ðŸ•’ Live Activity Feed
         </div>
         <div style={{ display:'flex', gap:'6px' }}>
           {['all','submitted','approved','rejected'].map(f => (

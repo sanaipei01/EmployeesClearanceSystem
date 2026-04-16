@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 function Stars({ rating }) {
   return (
     <div style={{ display:'flex', gap:'3px' }}>
       {[1,2,3,4,5].map(s => (
-        <span key={s} style={{ color: s <= rating ? '#FFD600' : 'rgba(255,255,255,0.15)', fontSize:'16px' }}>★</span>
+        <span key={s} style={{ color: s <= rating ? '#FFD600' : 'rgba(255,255,255,0.15)', fontSize:'16px' }}>â˜…</span>
       ))}
     </div>
   );
@@ -70,7 +70,7 @@ function FeedbackViewer() {
           <div style={{ fontSize:'40px', fontWeight:'800', fontFamily:'Syne,sans-serif', color:'#00E676' }}>
             {feedbacks.filter(f => f.rating >= 4).length}
           </div>
-          <div style={{ color:'#9CA3AF', fontSize:'12px', marginTop:'8px' }}>Positive (4-5★)</div>
+          <div style={{ color:'#9CA3AF', fontSize:'12px', marginTop:'8px' }}>Positive (4-5â˜…)</div>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ function FeedbackViewer() {
           <div style={{ fontFamily:'Syne,sans-serif', fontWeight:'700', fontSize:'15px', marginBottom:'16px' }}>Rating Breakdown</div>
           {ratingCounts.map(r => (
             <div key={r.stars} style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
-              <span style={{ color:'#FFD600', fontSize:'13px', width:'20px' }}>{r.stars}★</span>
+              <span style={{ color:'#FFD600', fontSize:'13px', width:'20px' }}>{r.stars}â˜…</span>
               <div style={{ flex:1, height:'8px', background:'rgba(255,255,255,0.08)', borderRadius:'4px' }}>
                 <div style={{ height:'100%', width:`${r.pct}%`, background:'#FFD600', borderRadius:'4px', transition:'width 0.5s' }} />
               </div>
@@ -114,7 +114,7 @@ function FeedbackViewer() {
       <div style={{ display:'flex', gap:'8px', marginBottom:'16px', flexWrap:'wrap' }}>
         {['all','5','4','3','2','1'].map(f => (
           <button key={f} className={`btn ${filter===f ? 'btn-primary':'btn-ghost'}`} style={{ padding:'7px 14px', fontSize:'12px' }} onClick={() => setFilter(f)}>
-            {f === 'all' ? 'All' : `${f}★`}
+            {f === 'all' ? 'All' : `${f}â˜…`}
           </button>
         ))}
       </div>
@@ -143,7 +143,7 @@ function FeedbackViewer() {
                 <p style={{ color:'#D1D5DB', fontSize:'13px', marginTop:'8px', lineHeight:'1.6' }}>{f.comment}</p>
                 {selected?.id === f.id && f.suggestion && (
                   <div style={{ marginTop:'12px', padding:'12px', background:'rgba(167,139,250,0.08)', border:'1px solid rgba(167,139,250,0.2)', borderRadius:'8px' }}>
-                    <div style={{ fontSize:'11px', color:'#A78BFA', fontWeight:'700', marginBottom:'4px', textTransform:'uppercase', letterSpacing:'0.5px' }}>💡 Suggestion</div>
+                    <div style={{ fontSize:'11px', color:'#A78BFA', fontWeight:'700', marginBottom:'4px', textTransform:'uppercase', letterSpacing:'0.5px' }}>ðŸ’¡ Suggestion</div>
                     <p style={{ color:'#D1D5DB', fontSize:'13px', margin:0 }}>{f.suggestion}</p>
                   </div>
                 )}
@@ -162,7 +162,7 @@ function FeedbackViewer() {
           <div className="modal" style={{ maxWidth:'520px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Feedback Details</h3>
-              <button className="close-btn" onClick={() => setSelected(null)}>×</button>
+              <button className="close-btn" onClick={() => setSelected(null)}>Ã—</button>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'16px' }}>
               <div style={{ width:'44px', height:'44px', borderRadius:'10px', background:'rgba(0,212,255,0.15)', color:'#00D4FF', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'700', fontSize:'18px' }}>
@@ -185,7 +185,7 @@ function FeedbackViewer() {
             </div>
             {selected.suggestion && (
               <div style={{ marginTop:'16px', padding:'14px', background:'rgba(167,139,250,0.08)', border:'1px solid rgba(167,139,250,0.2)', borderRadius:'10px' }}>
-                <div style={{ fontSize:'11px', color:'#A78BFA', fontWeight:'700', marginBottom:'8px', textTransform:'uppercase', letterSpacing:'0.5px' }}>💡 Suggestion</div>
+                <div style={{ fontSize:'11px', color:'#A78BFA', fontWeight:'700', marginBottom:'8px', textTransform:'uppercase', letterSpacing:'0.5px' }}>ðŸ’¡ Suggestion</div>
                 <p style={{ fontSize:'14px', lineHeight:'1.7', color:'#D1D5DB', margin:0 }}>{selected.suggestion}</p>
               </div>
             )}

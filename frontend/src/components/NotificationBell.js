@@ -1,28 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 
 const NOTIFS_BY_ROLE = {
   employee: [
-    { id:1, message:'Your Travel Clearance was approved ✅',       time:'2 mins ago', read:false, type:'success' },
-    { id:2, message:'Your Leave Clearance is being processed 🔄',  time:'1 hr ago',   read:false, type:'info' },
-    { id:3, message:'Your Resignation request was received 📋',    time:'Yesterday',  read:true,  type:'info' },
+    { id:1, message:'Your Travel Clearance was approved âœ…',       time:'2 mins ago', read:false, type:'success' },
+    { id:2, message:'Your Leave Clearance is being processed ðŸ”„',  time:'1 hr ago',   read:false, type:'info' },
+    { id:3, message:'Your Resignation request was received ðŸ“‹',    time:'Yesterday',  read:true,  type:'info' },
   ],
   hr: [
-    { id:1, message:'New clearance request needs your review 📋',  time:'2 mins ago', read:false, type:'warning' },
+    { id:1, message:'New clearance request needs your review ðŸ“‹',  time:'2 mins ago', read:false, type:'warning' },
     { id:2, message:'Kosiom Naikumi submitted a Leave Clearance',  time:'1 hr ago',   read:false, type:'info' },
     { id:3, message:'Resian Camila submitted a Travel Clearance',  time:'3 hrs ago',  read:false, type:'info' },
-    { id:4, message:'Soyian Mumbi clearance approved ✅',          time:'Yesterday',  read:true,  type:'success' },
+    { id:4, message:'Soyian Mumbi clearance approved âœ…',          time:'Yesterday',  read:true,  type:'success' },
   ],
   manager: [
-    { id:1, message:'Soyian Mumbi submitted a Leave Clearance 📋', time:'5 mins ago', read:false, type:'warning' },
-    { id:2, message:'Kosiom Naikumi travel request is pending ⏳', time:'2 hrs ago',  read:false, type:'info' },
-    { id:3, message:'Resian Camila request was approved ✅',       time:'Yesterday',  read:true,  type:'success' },
+    { id:1, message:'Soyian Mumbi submitted a Leave Clearance ðŸ“‹', time:'5 mins ago', read:false, type:'warning' },
+    { id:2, message:'Kosiom Naikumi travel request is pending â³', time:'2 hrs ago',  read:false, type:'info' },
+    { id:3, message:'Resian Camila request was approved âœ…',       time:'Yesterday',  read:true,  type:'success' },
   ],
   admin: [
-    { id:1, message:'3 requests pending approval ⏳',              time:'10 mins ago',read:false, type:'warning' },
-    { id:2, message:'Seela Stacy resignation submitted 📝',        time:'1 hr ago',   read:false, type:'info' },
-    { id:3, message:'New user account created 👤',                 time:'2 hrs ago',  read:false, type:'info' },
-    { id:4, message:'System backup completed ✅',                  time:'Yesterday',  read:true,  type:'success' },
-    { id:5, message:'Monthly report is ready 📊',                  time:'2 days ago', read:true,  type:'info' },
+    { id:1, message:'3 requests pending approval â³',              time:'10 mins ago',read:false, type:'warning' },
+    { id:2, message:'Seela Stacy resignation submitted ðŸ“',        time:'1 hr ago',   read:false, type:'info' },
+    { id:3, message:'New user account created ðŸ‘¤',                 time:'2 hrs ago',  read:false, type:'info' },
+    { id:4, message:'System backup completed âœ…',                  time:'Yesterday',  read:true,  type:'success' },
+    { id:5, message:'Monthly report is ready ðŸ“Š',                  time:'2 days ago', read:true,  type:'info' },
   ],
 };
 
@@ -61,7 +61,7 @@ function NotificationBell() {
           fontSize:'17px',
         }}
       >
-        🔔
+        ðŸ””
         {unread > 0 && (
           <div style={{
             position:'absolute', top:'-4px', right:'-4px',

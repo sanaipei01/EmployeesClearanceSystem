@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NotificationBell from '../components/NotificationBell';
 import ThemeToggle from '../components/ThemeToggle';
@@ -38,18 +38,18 @@ function DashboardLayout({ children, navItems, role, activeTab, setActiveTab }) 
     <div className={`layout ${collapsed && !isMobile ? 'collapsed' : ''}`}>
       <aside className="sidebar">
 
-        {/* ── Desktop: full sidebar header ── */}
+        {/* â”€â”€ Desktop: full sidebar header â”€â”€ */}
         {!isMobile && (
           <div className="sidebar-header">
             <div className="sidebar-logo" style={{ color: roleColor }}>ECS</div>
             {!collapsed && <span className="sidebar-title">Clearance</span>}
             <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
-              {collapsed ? '→' : '←'}
+              {collapsed ? 'â†’' : 'â†'}
             </button>
           </div>
         )}
 
-        {/* ── Desktop: role badge ── */}
+        {/* â”€â”€ Desktop: role badge â”€â”€ */}
         {!isMobile && !collapsed && (
           <div
             className="sidebar-role-badge"
@@ -59,7 +59,7 @@ function DashboardLayout({ children, navItems, role, activeTab, setActiveTab }) 
           </div>
         )}
 
-        {/* ── Nav items ── */}
+        {/* â”€â”€ Nav items â”€â”€ */}
         <nav className="sidebar-nav">
           {visibleNavItems.map(item => (
             <button
@@ -87,7 +87,7 @@ function DashboardLayout({ children, navItems, role, activeTab, setActiveTab }) 
           ))}
         </nav>
 
-        {/* ── Desktop: footer with user info + logout ── */}
+        {/* â”€â”€ Desktop: footer with user info + logout â”€â”€ */}
         {!isMobile && (
           <div className="sidebar-footer">
             {!collapsed && (
@@ -105,7 +105,7 @@ function DashboardLayout({ children, navItems, role, activeTab, setActiveTab }) 
               </div>
             )}
             <button className="logout-btn" onClick={handleLogout}>
-              <span>🚪</span>
+              <span>ðŸšª</span>
               {!collapsed && <span>Logout</span>}
             </button>
           </div>
@@ -140,7 +140,7 @@ function DashboardLayout({ children, navItems, role, activeTab, setActiveTab }) 
                   lineHeight: 1,
                 }}
               >
-                🚪
+                ðŸšª
               </button>
             )}
           </div>
