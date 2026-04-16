@@ -85,10 +85,10 @@ async function migrate() {
 
   console.log('\n🔄 Creating default users...');
 
-  const adminPassword = await bcrypt.hash('REMOVED', 10);
-  const hrPassword = await bcrypt.hash('REMOVED', 10);
-  const managerPassword = await bcrypt.hash('REMOVED', 10);
-  const employeePassword = await bcrypt.hash('REMOVED', 10);
+  const adminPassword = await bcrypt.hash('REMOVED', 7);
+  const hrPassword = await bcrypt.hash('REMOVED', 7);
+  const managerPassword = await bcrypt.hash('REMOVED', 7);
+  const employeePassword = await bcrypt.hash('REMOVED', 7);
 
   // Insert admin
   await db.query(`
