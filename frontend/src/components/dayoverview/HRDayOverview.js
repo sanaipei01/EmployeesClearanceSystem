@@ -1,242 +1,203 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+const ACCENT = '#FFD600';
 const INITIAL_MESSAGES = [
-  { id: 1, from: 'Admin',   msg: 'New hire onboarding docs ready for review.',        me: false, time: '8:20 AM', role: 'admin' },
-  { id: 2, from: 'You',     msg: "I'll review and sign off before noon.",              me: true,  time: '8:25 AM', role: 'hr' },
-  { id: 3, from: 'Manager', msg: "Can you fast-track Sarah's resignation clearance?",  me: false, time: '8:50 AM', role: 'manager' },
+  { id:1, from:'Admin',   msg:'New hire onboarding docs ready for review.', me:false, time:'8:20 AM', role:'admin' },
+  { id:2, from:'You',     msg:"I'll review and sign off before noon.",       me:true,  time:'8:25 AM', role:'hr' },
+  { id:3, from:'Manager', msg:"Can you fast-track Sarah's clearance?",       me:false, time:'8:50 AM', role:'manager' },
 ];
-
 const AUTO_REPLIES = [
-  { from: 'Admin',    msg: 'Also 2 exit interviews scheduled for this afternoon.',      role: 'admin' },
-  { from: 'Manager',  msg: 'Payroll cut-off is tomorrow — please finalise headcount.',  role: 'manager' },
-  { from: 'Employee', msg: 'Hi, I need help understanding my clearance status.',        role: 'employee' },
+  { from:'Admin',    msg:'2 exit interviews scheduled this afternoon.',    role:'admin' },
+  { from:'Manager',  msg:'Payroll cut-off tomorrow — finalise headcount.', role:'manager' },
+  { from:'Employee', msg:'Hi, I need help with my clearance status.',      role:'employee' },
 ];
-
-const ROLE_COLORS = { hr: '#00E676', manager: '#00D4FF', admin: '#FFD600', employee: '#FF6B35' };
-
-const KPI_DATA = [
-  { label: 'Clearances',   value: 18, target: 20, unit: '',  good: false },
-  { label: 'Onboarding',   value: 5,  target: 5,  unit: '',  good: true  },
-  { label: 'Compliance',   value: 97, target: 90, unit: '%', good: true  },
-  { label: 'Open Roles',   value: 8,  target: 5,  unit: '',  good: false },
-  { label: 'Retention',    value: 91, target: 88, unit: '%', good: true  },
+const ROLE_COLORS = { hr:'#00E676', manager:'#00D4FF', admin:'#FFD600', employee:'#FF6B35' };
+const KPI = [
+  { label:'Clearances', value:18, target:20, unit:'',  good:false },
+  { label:'Onboarding', value:5,  target:5,  unit:'',  good:true  },
+  { label:'Compliance', value:97, target:90, unit:'%', good:true  },
+  { label:'Open Roles', value:8,  target:5,  unit:'',  good:false },
+  { label:'Retention',  value:91, target:88, unit:'%', good:true  },
 ];
-
-const TIMELINE_TODAY = [
-  { time: '08:00', label: 'Review onboarding docs',     type: 'task',    done: true  },
-  { time: '09:00', label: 'HR department standup',       type: 'meeting', done: true  },
-  { time: '10:30', label: 'Process clearance backlog',   type: 'task',    done: false, urgent: true },
-  { time: '13:00', label: 'Exit interview — John D.',    type: 'meeting', done: false },
-  { time: '14:30', label: 'Exit interview — Alice M.',   type: 'meeting', done: false },
-  { time: '16:00', label: 'Payroll data submission',     type: 'task',    done: false, urgent: true },
+const TIMELINE = [
+  { time:'08:00', label:'Review onboarding docs',    done:true,  urgent:false },
+  { time:'09:00', label:'HR department standup',      done:true,  urgent:false },
+  { time:'10:30', label:'Process clearance backlog',  done:false, urgent:true  },
+  { time:'13:00', label:'Exit interview — John D.',   done:false, urgent:false },
+  { time:'16:00', label:'Payroll data submission',    done:false, urgent:true  },
 ];
-
 const GOALS = [
-  { label: 'Clearance processing rate',  value: 90, good: true  },
-  { label: 'Onboarding completion',       value: 78, good: false },
-  { label: 'Policy compliance score',     value: 97, good: true  },
-  { label: 'Open role fill rate',         value: 50, good: false },
+  { label:'Clearance rate',   value:90, good:true  },
+  { label:'Onboarding',       value:78, good:false },
+  { label:'Compliance score', value:97, good:true  },
+  { label:'Role fill rate',   value:50, good:false },
 ];
-
-const CALENDAR_EVENTS = [1, 4, 8, 10, 15, 17, 21, 25, 28];
-const TODAY_DATE  = new Date().getDate();
-const MONTH_START = 2;
-
-function KPIBadge({ good, label }) {
-  return (
-    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 10px', borderRadius:20, fontSize:11, fontWeight:700, background: good ? 'rgba(0,230,118,0.15)' : 'rgba(255,82,82,0.15)', color: good ? '#00E676' : '#FF5252', border:`1px solid ${good ? 'rgba(0,230,118,0.3)' : 'rgba(255,82,82,0.3)'}` }}>
-      <span style={{ width:7, height:7, borderRadius:'50%', background: good ? '#00E676' : '#FF5252', boxShadow: good ? '0 0 6px #00E676' : '0 0 6px #FF5252', flexShrink:0 }} />
-      {label}
-    </span>
-  );
-}
-
-function YesterdayChart({ visible }) {
-  return (
-    <div style={{ background:'linear-gradient(135deg,#0a0a0a,#111)', border:'1px solid rgba(255,214,0,0.2)', borderRadius:14, padding:'18px 20px', marginBottom:16 }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-        <div>
-          <div style={{ fontFamily:'Syne,sans-serif', fontWeight:700, fontSize:13, color:'#FFD600' }}>📊 HR Metrics — Yesterday</div>
-          <div style={{ fontSize:11, color:'var(--muted)', marginTop:2 }}>vs. HR department targets</div>
-        </div>
-        <div style={{ display:'flex', gap:8 }}><KPIBadge good label="On target" /><KPIBadge good={false} label="Needs action" /></div>
-      </div>
-      <div style={{ display:'flex', alignItems:'flex-end', gap:10, height:100 }}>
-        {KPI_DATA.map((d,i) => {
-          const pct  = Math.min(100,(d.value/(d.target*1.2))*100);
-          const barH = visible ? Math.round((pct/100)*80) : 0;
-          const color = d.good ? '#00E676' : '#FF5252';
-          return (
-            <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
-              <span style={{ fontSize:10, fontWeight:700, color }}>{d.value}{d.unit}</span>
-              <div style={{ width:'100%', height:80, display:'flex', alignItems:'flex-end' }}>
-                <div style={{ width:'100%', height:barH, borderRadius:'4px 4px 0 0', background:color, boxShadow:`0 0 8px ${color}55`, transition:`height .7s cubic-bezier(.4,0,.2,1) ${i*100}ms` }} />
-              </div>
-              <span style={{ fontSize:9, color:'var(--muted)', textAlign:'center', lineHeight:1.3 }}>{d.label}</span>
-            </div>
-          );
-        })}
-      </div>
-      <div style={{ marginTop:14, padding:'8px 12px', borderRadius:8, background:'rgba(255,214,0,0.06)', border:'1px solid rgba(255,214,0,0.15)', fontSize:12, color:'var(--muted)' }}>
-        <span style={{ color:'#FFD600', fontWeight:700 }}>HR Status: </span>
-        Compliance & retention strong — focus on <span style={{ color:'#FF5252', fontWeight:600 }}>clearance backlog & open roles</span> today.
-      </div>
-    </div>
-  );
-}
-
-function TodayTimeline() {
-  const tc = { meeting:'#00D4FF', task:'#FFD600', break:'#FF6B35' };
-  const ti = { meeting:'🤝', task:'📋', break:'☕' };
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-      {TIMELINE_TODAY.map((item,i) => (
-        <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 10px', borderRadius:8, background:item.urgent?'rgba(255,107,53,0.1)':'rgba(255,255,255,0.03)', border:`1px solid ${item.urgent?'rgba(255,107,53,0.3)':'rgba(255,255,255,0.06)'}`, opacity:item.done?0.5:1 }}>
-          <span style={{ fontSize:12, minWidth:42, color:'var(--muted)' }}>{item.time}</span>
-          <div style={{ width:8, height:8, borderRadius:'50%', flexShrink:0, background:item.done?'var(--muted)':tc[item.type], boxShadow:item.done?'none':`0 0 6px ${tc[item.type]}` }} />
-          <span style={{ fontSize:11, flex:1 }}>{ti[item.type]} {item.label}</span>
-          {item.urgent && <span style={{ fontSize:9, color:'#FF6B35', fontWeight:700, background:'rgba(255,107,53,0.15)', padding:'2px 6px', borderRadius:10 }}>URGENT</span>}
-          {item.done && <span style={{ fontSize:9, color:'#00E676' }}>✓</span>}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function GoalProgress() {
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-      {GOALS.map((g,i) => (
-        <div key={i}>
-          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
-            <span style={{ fontSize:11 }}>{g.label}</span>
-            <KPIBadge good={g.good} label={`${g.value}%`} />
-          </div>
-          <div style={{ height:6, background:'rgba(255,255,255,0.08)', borderRadius:4, overflow:'hidden' }}>
-            <div style={{ height:'100%', borderRadius:4, width:`${g.value}%`, background:g.good?'#00E676':'#FF5252', boxShadow:g.good?'0 0 6px rgba(0,230,118,0.4)':'0 0 6px rgba(255,82,82,0.4)', transition:'width 1s cubic-bezier(.4,0,.2,1)' }} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MiniCalendar() {
-  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-  return (
-    <div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, textAlign:'center', marginBottom:4 }}>
-        {days.map(d => <div key={d} style={{ fontSize:9, color:'var(--muted)', fontWeight:700 }}>{d}</div>)}
-      </div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, textAlign:'center' }}>
-        {Array.from({length:MONTH_START},(_,i)=><div key={`e${i}`}/>)}
-        {Array.from({length:30},(_,i)=>i+1).map(n=>{
-          const isToday=n===TODAY_DATE, hasEvent=CALENDAR_EVENTS.includes(n);
-          return <div key={n} style={{ fontSize:10, padding:'3px 1px', borderRadius:4, background:isToday?'#FFD600':hasEvent?'rgba(255,214,0,0.12)':'transparent', color:isToday?'#000':hasEvent?'#FFD600':'inherit', fontWeight:isToday||hasEvent?700:400 }}>{n}</div>;
-        })}
-      </div>
-      <div style={{ marginTop:8, fontSize:10, color:'var(--muted)' }}>🟡 {CALENDAR_EVENTS.length} events this month</div>
-    </div>
-  );
-}
+const TODAY  = new Date().getDate();
+const EVENTS = [1,4,8,10,15,17,21,25,28];
 
 function ChatPanel() {
-  const [messages,setMessages]=useState(INITIAL_MESSAGES);
-  const [input,setInput]=useState('');
-  const [typing,setTyping]=useState(false);
-  const bottomRef=useRef(null);
-  const replyIdx=useRef(0);
-  useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:'smooth'})},[messages,typing]);
-  const send=()=>{
-    if(!input.trim())return;
-    const now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    setMessages(p=>[...p,{id:Date.now(),from:'You',msg:input.trim(),me:true,time:now,role:'hr'}]);
+  const [msgs, setMsgs]     = useState(INITIAL_MESSAGES);
+  const [input, setInput]   = useState('');
+  const [typing, setTyping] = useState(false);
+  const ref = useRef(null);
+  const idx = useRef(0);
+  useEffect(()=>{ ref.current?.scrollIntoView({ behavior:'smooth' }); },[msgs,typing]);
+  const send = () => {
+    if (!input.trim()) return;
+    const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setMsgs(p=>[...p,{id:Date.now(),from:'You',msg:input.trim(),me:true,time:now,role:'hr'}]);
     setInput('');
-    const r=AUTO_REPLIES[replyIdx.current%AUTO_REPLIES.length];replyIdx.current++;
+    const r = AUTO_REPLIES[idx.current % AUTO_REPLIES.length]; idx.current++;
     setTyping(true);
-    setTimeout(()=>{setTyping(false);setMessages(p=>[...p,{id:Date.now()+1,from:r.from,msg:r.msg,me:false,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),role:r.role}]);},1400);
+    setTimeout(()=>{ setTyping(false); setMsgs(p=>[...p,{id:Date.now()+1,from:r.from,msg:r.msg,me:false,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),role:r.role}]); },1200);
   };
   return (
-    <div style={{ display:'flex', flexDirection:'column', background:'#0a0a0a', border:'1px solid rgba(255,214,0,0.15)', borderRadius:14, overflow:'hidden', height:'100%' }}>
-      <div style={{ padding:'12px 16px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(255,214,0,0.05)' }}>
-        <div style={{ fontFamily:'Syne,sans-serif', fontWeight:700, fontSize:13, color:'#FFD600' }}>💬 HR Chat</div>
-        <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-          <span style={{ width:7, height:7, borderRadius:'50%', background:'#00E676', boxShadow:'0 0 6px #00E676', display:'inline-block' }}/>
-          <span style={{ fontSize:10, color:'#00E676' }}>4 online</span>
-        </div>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%', background:'rgba(255,255,255,0.02)', border:`1px solid ${ACCENT}30`, borderRadius:10, overflow:'hidden' }}>
+      <div style={{ padding:'6px 10px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center', flexShrink:0 }}>
+        <span style={{ fontSize:11, fontWeight:700, color:ACCENT }}>💬 HR Chat</span>
+        <span style={{ fontSize:10, color:'#00E676' }}>● 4 online</span>
       </div>
-      <div style={{ flex:1, overflowY:'auto', padding:12, display:'flex', flexDirection:'column', gap:8, minHeight:0 }}>
-        {messages.map(m=>(
+      <div style={{ flex:1, overflowY:'auto', padding:'8px', display:'flex', flexDirection:'column', gap:5, minHeight:0 }}>
+        {msgs.map(m=>(
           <div key={m.id} style={{ display:'flex', flexDirection:'column', alignItems:m.me?'flex-end':'flex-start' }}>
-            {!m.me&&<span style={{ fontSize:9, color:ROLE_COLORS[m.role]||'var(--muted)', marginBottom:2, fontWeight:700 }}>{m.from}</span>}
-            <div style={{ maxWidth:'82%', padding:'7px 11px', borderRadius:10, fontSize:12, lineHeight:1.5, borderBottomRightRadius:m.me?3:10, borderBottomLeftRadius:m.me?10:3, background:m.me?'linear-gradient(135deg,#FFD600,#ffc400)':'rgba(255,255,255,0.06)', border:m.me?'none':'1px solid rgba(255,255,255,0.08)', color:m.me?'#000':'var(--text)' }}>{m.msg}</div>
-            <span style={{ fontSize:9, color:'var(--muted)', marginTop:2 }}>{m.time}</span>
+            {!m.me && <span style={{ fontSize:9, color:ROLE_COLORS[m.role], marginBottom:1, fontWeight:700 }}>{m.from}</span>}
+            <div style={{ maxWidth:'85%', padding:'5px 8px', borderRadius:8, fontSize:11, lineHeight:1.4, borderBottomRightRadius:m.me?2:8, borderBottomLeftRadius:m.me?8:2, background:m.me?ACCENT:'rgba(255,255,255,0.08)', color:m.me?'#000':'var(--text,#F9FAFB)' }}>{m.msg}</div>
+            <span style={{ fontSize:9, color:'var(--muted,#9CA3AF)', marginTop:1 }}>{m.time}</span>
           </div>
         ))}
-        {typing&&<div style={{ display:'flex', gap:3, padding:'8px 12px', background:'rgba(255,255,255,0.06)', borderRadius:10, width:'fit-content' }}>{[0,1,2].map(i=><span key={i} style={{ width:5, height:5, borderRadius:'50%', background:'#FFD600', animation:`typingDot 1.2s ease-in-out ${i*0.2}s infinite` }}/>)}</div>}
-        <div ref={bottomRef}/>
+        {typing && <div style={{ display:'flex', gap:3, padding:'5px 8px', background:'rgba(255,255,255,0.06)', borderRadius:8, width:'fit-content' }}>{[0,1,2].map(i=><span key={i} style={{ width:4, height:4, borderRadius:'50%', background:ACCENT, animation:`chatDot 1.2s ease-in-out ${i*0.2}s infinite` }}/>)}</div>}
+        <div ref={ref}/>
       </div>
-      <div style={{ padding:'10px 12px', borderTop:'1px solid rgba(255,255,255,0.06)', display:'flex', gap:8 }}>
-        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Message HR team..." style={{ flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, padding:'7px 12px', fontSize:12, color:'var(--text)', outline:'none' }}/>
-        <button onClick={send} style={{ background:'#FFD600', border:'none', borderRadius:8, width:34, height:34, cursor:'pointer', fontSize:14, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'#000' }}>→</button>
+      <div style={{ padding:'6px 8px', borderTop:'1px solid rgba(255,255,255,0.06)', display:'flex', gap:6, flexShrink:0 }}>
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Message HR team..." style={{ flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'5px 8px', fontSize:11, color:'var(--text,#F9FAFB)', outline:'none' }}/>
+        <button onClick={send} style={{ background:ACCENT, border:'none', borderRadius:6, width:28, height:28, cursor:'pointer', color:'#000', fontSize:12, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>→</button>
       </div>
     </div>
   );
 }
 
 function HRDayOverview({ onEnter }) {
-  const user=JSON.parse(localStorage.getItem('ecs_user')||'{}');
-  const [visible,setVisible]=useState(false);
-  const [leaving,setLeaving]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setVisible(true),100);return()=>clearTimeout(t);},[]);
-  const handleEnter=()=>{setLeaving(true);setTimeout(()=>onEnter(),500);};
-  const now=new Date(), hour=now.getHours();
-  const greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
-  const dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const user    = JSON.parse(localStorage.getItem('ecs_user') || '{}');
+  const [vis,   setVis]   = useState(false);
+  const [leave, setLeave] = useState(false);
+  useEffect(()=>{ const t=setTimeout(()=>setVis(true),100); return()=>clearTimeout(t); },[]);
+  const go = () => { setLeave(true); setTimeout(()=>onEnter(),400); };
+  const now  = new Date();
+  const hour = now.getHours();
+  const greeting = hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+
   return (
     <>
       <style>{`
-        @keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
-        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .hr-ov-root{animation:fadeSlideIn .4s ease both}
-        .hr-ov-root.leaving{animation:fadeSlideIn .4s ease reverse both}
-        .hr-enter-btn{background:linear-gradient(135deg,#FFD600,#ffc400);border:none;border-radius:10px;padding:12px 28px;font-family:Syne,sans-serif;font-weight:700;font-size:14px;color:#000;cursor:pointer;transition:opacity .15s,transform .15s;box-shadow:0 4px 20px rgba(255,214,0,0.4)}
-        .hr-enter-btn:hover{opacity:.9;transform:translateY(-1px)}
-        .hr-section{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px}
-        .hr-section-title{font-family:Syne,sans-serif;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+        @keyframes chatDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-3px);opacity:1}}
+        @keyframes ovIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .hr-ov{animation:ovIn .35s ease both}
+        .hr-ov.out{animation:ovIn .35s ease reverse both}
+        .hr-enter{border:none;border-radius:8px;padding:8px 20px;font-family:Syne,sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .15s,transform .15s;white-space:nowrap;flex-shrink:0}
+        .hr-enter:hover{opacity:.88;transform:translateY(-1px)}
+        .hr-sec{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px;overflow:hidden}
+        .hr-sec-t{font-size:10px;font-weight:700;color:var(--muted,#9CA3AF);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
       `}</style>
-      <div className={`hr-ov-root${leaving?' leaving':''}`} style={{ position:'absolute', inset:0, overflowY:'auto', background:'var(--bg,#0d0d0d)', zIndex:20, padding:'24px 28px' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
+      <div className={`hr-ov${leave?' out':''}`} style={{ position:'fixed', inset:0, background:'var(--bg,#0A0F1E)', zIndex:999, display:'flex', flexDirection:'column', padding:'12px 18px', gap:10, overflow:'hidden' }}>
+
+        {/* HEADER */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexShrink:0 }}>
           <div>
-            <div style={{ fontFamily:'Syne,sans-serif', fontWeight:800, fontSize:22 }}>{greeting}, {user.name?.split(' ')[0]||'HR'} 👋</div>
-            <div style={{ fontSize:13, color:'var(--muted)', marginTop:4 }}>{dateStr}</div>
-            <div style={{ marginTop:10, display:'flex', gap:8, flexWrap:'wrap' }}>
-              <KPIBadge good label="Compliance strong" />
-              <KPIBadge good={false} label="2 urgent tasks" />
-              <KPIBadge good label="2 exit interviews" />
-            </div>
-          </div>
-          <button className="hr-enter-btn" onClick={handleEnter}>Enter Dashboard →</button>
-        </div>
-        <YesterdayChart visible={visible}/>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:14, marginBottom:14 }}>
-          <div className="hr-section"><div className="hr-section-title">🕐 Today's Schedule</div><TodayTimeline/></div>
-          <div className="hr-section">
-            <div className="hr-section-title">🎯 HR Goals</div>
-            <GoalProgress/>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginTop:14 }}>
-              {[{icon:'👥',label:'Headcount',value:'48',color:'#00D4FF'},{icon:'📋',label:'Clearances',value:'18',color:'#00E676'},{icon:'🚪',label:'Exits',value:'2',color:'#FF5252'},{icon:'🆕',label:'New Hires',value:'5',color:'#FFD600'}].map((s,i)=>(
-                <div key={i} style={{ padding:10, borderRadius:8, background:`${s.color}10`, border:`1px solid ${s.color}25`, textAlign:'center' }}>
-                  <div style={{ fontSize:18 }}>{s.icon}</div>
-                  <div style={{ fontSize:18, fontWeight:800, fontFamily:'Syne,sans-serif', color:s.color, lineHeight:1.2 }}>{s.value}</div>
-                  <div style={{ fontSize:10, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
-                </div>
+            <div style={{ fontFamily:'Syne,sans-serif', fontWeight:800, fontSize:17, color:'var(--text,#F9FAFB)' }}>{greeting}, {user.name?.split(' ')[0]||'HR'} 👋</div>
+            <div style={{ fontSize:11, color:'var(--muted,#9CA3AF)', marginTop:1 }}>{now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+            <div style={{ display:'flex', gap:5, marginTop:4 }}>
+              {[{t:'Compliance strong',g:true},{t:'2 urgent tasks',g:false},{t:'2 exit interviews',g:true}].map((b,i)=>(
+                <span key={i} style={{ display:'inline-flex', alignItems:'center', gap:3, padding:'2px 7px', borderRadius:20, fontSize:10, fontWeight:700, background:b.g?'rgba(0,230,118,0.12)':'rgba(255,82,82,0.12)', color:b.g?'#00E676':'#FF5252', border:`1px solid ${b.g?'rgba(0,230,118,0.25)':'rgba(255,82,82,0.25)'}` }}>
+                  <span style={{ width:5, height:5, borderRadius:'50%', background:b.g?'#00E676':'#FF5252', display:'inline-block' }}/>{b.t}
+                </span>
               ))}
             </div>
           </div>
-          <div className="hr-section"><div className="hr-section-title">📅 {now.toLocaleString('default',{month:'long',year:'numeric'})}</div><MiniCalendar/></div>
+          <button className="hr-enter" onClick={go} style={{ background:`linear-gradient(135deg,${ACCENT},#ffc400)`, color:'#000', boxShadow:`0 4px 14px ${ACCENT}50` }}>Enter Dashboard →</button>
         </div>
-        <div style={{ height:300 }}><ChatPanel/></div>
+
+        {/* KPI CHART */}
+        <div style={{ background:'linear-gradient(135deg,#4a3800,#7a5c00)', borderRadius:10, padding:'10px 14px', flexShrink:0 }}>
+          <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.65)', marginBottom:6, textTransform:'uppercase', letterSpacing:.5 }}>📊 HR Metrics — Yesterday</div>
+          <div style={{ display:'flex', alignItems:'flex-end', gap:8, height:52 }}>
+            {KPI.map((d,i)=>{
+              const h = vis ? Math.round((Math.min(100,(d.value/(d.target*1.2))*100)/100)*40) : 0;
+              return (
+                <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
+                  <span style={{ fontSize:9, fontWeight:700, color:d.good?'#00E676':'#FF5252' }}>{d.value}{d.unit}</span>
+                  <div style={{ width:'100%', height:h, borderRadius:'3px 3px 0 0', background:d.good?'rgba(0,230,118,0.85)':'rgba(255,82,82,0.75)', transition:`height .6s cubic-bezier(.4,0,.2,1) ${i*80}ms`, minHeight:3 }}/>
+                  <span style={{ fontSize:9, color:'rgba(255,255,255,0.55)', textAlign:'center' }}>{d.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* MAIN GRID */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1.2fr', gap:10, flex:1, minHeight:0 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:8, minHeight:0 }}>
+            <div className="hr-sec" style={{ flex:1 }}>
+              <div className="hr-sec-t">🕐 Today's Schedule</div>
+              <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                {TIMELINE.map((t,i)=>(
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:6, opacity:t.done?.5:1 }}>
+                    <span style={{ fontSize:10, color:'var(--muted,#9CA3AF)', minWidth:36, flexShrink:0 }}>{t.time}</span>
+                    <div style={{ width:6, height:6, borderRadius:'50%', flexShrink:0, background:t.done?'#444':t.urgent?'#FF6B35':ACCENT, boxShadow:t.done?'none':`0 0 4px ${t.urgent?'#FF6B35':ACCENT}` }}/>
+                    <span style={{ fontSize:10, flex:1, color:'var(--text,#F9FAFB)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{t.label}</span>
+                    {t.urgent && <span style={{ fontSize:8, color:'#FF6B35', fontWeight:700 }}>!</span>}
+                    {t.done && <span style={{ fontSize:9, color:'#00E676' }}>✓</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="hr-sec" style={{ flex:1 }}>
+              <div className="hr-sec-t">🎯 HR Goals</div>
+              <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                {GOALS.map((g,i)=>(
+                  <div key={i}>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:2 }}>
+                      <span style={{ fontSize:10, color:'var(--text,#F9FAFB)' }}>{g.label}</span>
+                      <span style={{ fontSize:10, fontWeight:700, color:g.good?'#00E676':'#FF5252' }}>{g.value}%</span>
+                    </div>
+                    <div style={{ height:5, background:'rgba(255,255,255,0.08)', borderRadius:3, overflow:'hidden' }}>
+                      <div style={{ height:'100%', width:`${g.value}%`, borderRadius:3, background:g.good?'#00E676':'#FF5252', transition:'width 1s ease' }}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display:'flex', flexDirection:'column', gap:8, minHeight:0 }}>
+            <div className="hr-sec">
+              <div className="hr-sec-t">👥 HR Snapshot</div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
+                {[{icon:'👥',label:'Headcount',value:'48',color:'#00D4FF'},{icon:'📋',label:'Clearances',value:'18',color:'#00E676'},{icon:'🚪',label:'Exits',value:'2',color:'#FF5252'},{icon:'🆕',label:'New Hires',value:'5',color:ACCENT}].map((s,i)=>(
+                  <div key={i} style={{ padding:'7px 5px', borderRadius:8, background:`${s.color}10`, border:`1px solid ${s.color}20`, textAlign:'center' }}>
+                    <div style={{ fontSize:13 }}>{s.icon}</div>
+                    <div style={{ fontSize:15, fontWeight:800, fontFamily:'Syne,sans-serif', color:s.color }}>{s.value}</div>
+                    <div style={{ fontSize:9, color:'var(--muted,#9CA3AF)' }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="hr-sec" style={{ flex:1 }}>
+              <div className="hr-sec-t">📅 {now.toLocaleString('default',{month:'long',year:'numeric'})}</div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:1, textAlign:'center', marginBottom:3 }}>
+                {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=><div key={d} style={{ fontSize:8, color:'var(--muted,#9CA3AF)', fontWeight:700 }}>{d}</div>)}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:1, textAlign:'center' }}>
+                {Array.from({length:2},(_,i)=><div key={`e${i}`}/>)}
+                {Array.from({length:30},(_,i)=>i+1).map(n=>{
+                  const isT=n===TODAY, hasE=EVENTS.includes(n);
+                  return <div key={n} style={{ fontSize:9, padding:'2px 1px', borderRadius:3, background:isT?ACCENT:hasE?`${ACCENT}20`:'transparent', color:isT?'#000':hasE?ACCENT:'var(--text,#F9FAFB)', fontWeight:isT||hasE?700:400 }}>{n}</div>;
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ minHeight:0, overflow:'hidden' }}><ChatPanel/></div>
+        </div>
       </div>
     </>
   );
