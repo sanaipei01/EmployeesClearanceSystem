@@ -1,25 +1,28 @@
-const express  = require('express');
-const cors     = require('cors');
-const mysql    = require('mysql2/promise');
-const bcrypt   = require('bcryptjs');
-const jwt      = require('jsonwebtoken');
+﻿const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const email = require('./emailService');
 
-const app  = express();
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ─── DB CONNECTION ───────────────────────────────────────────
+// Database connection pool
 const db = mysql.createPool({
-  host:     process.env.DB_HOST     || 'localhost',
-  port:     parseInt(process.env.DB_PORT) || 3306,
-  user:     process.env.DB_USER     || 'root',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME     || 'ecs_db',
+  database: process.env.DB_NAME || 'ecs_db',
   waitForConnections: true,
-  connectionLimit:    10,
-  ssl: { rejectUnauthorized: false },
+  connectionLimit: 20,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+  ssl: { rejectUnauthorized: true },
 });
 
 // Test DB connection on startup
@@ -32,7 +35,7 @@ db.getConnection()
     console.error('❌ MySQL connection failed:', err.message);
   });
 
-// ─── JWT MIDDLEWARE ──────────────────────────────────────────
+// JWT Middleware
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token provided' });
@@ -44,16 +47,14 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// ─── AUTH ROUTES ─────────────────────────────────────────────
-
-// POST /api/auth/login
+// Login endpoint
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
     if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const user  = rows[0];
+    const user = rows[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });
 
@@ -73,88 +74,66 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// ─── REQUESTS ROUTES ─────────────────────────────────────────
-
-// GET /api/requests — all requests (admin & hr)
+// Get all requests (Admin & HR)
 app.get('/api/requests', authMiddleware, async (req, res) => {
   try {
-    const [rows] = await db.query(`
+    const [rows] = await db.query(
       SELECT cr.*, e.name AS employee_name, e.department
       FROM clearance_requests cr
       JOIN employees e ON cr.employee_id = e.id
       ORDER BY cr.created_at DESC
-    `);
+    );
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/requests/my — logged in employee's requests
+// Get my requests (Employee)
 app.get('/api/requests/my', authMiddleware, async (req, res) => {
   try {
-    const [rows] = await db.query(`
+    const [rows] = await db.query(
       SELECT cr.*, e.name AS employee_name
       FROM clearance_requests cr
       JOIN employees e ON cr.employee_id = e.id
       WHERE e.user_id = ?
       ORDER BY cr.created_at DESC
-    `, [req.user.id]);
+    , [req.user.id]);
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/requests/team — manager's team requests
+// Get team requests (Manager)
 app.get('/api/requests/team', authMiddleware, async (req, res) => {
   try {
-    const [rows] = await db.query(`
+    const [rows] = await db.query(
       SELECT cr.*, e.name AS employee_name, e.department
       FROM clearance_requests cr
       JOIN employees e ON cr.employee_id = e.id
       ORDER BY cr.created_at DESC
-    `);
+    );
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/requests — submit new request
+// Submit new request
 app.post('/api/requests', authMiddleware, async (req, res) => {
   try {
     const { type, reason, urgency } = req.body;
-    // Get employee record for this user
     const [empRows] = await db.query('SELECT id FROM employees WHERE user_id = ?', [req.user.id]);
     if (empRows.length === 0) return res.status(404).json({ error: 'Employee record not found' });
 
     const employeeId = empRows[0].id;
-    const requestNo  = `REQ-${Date.now().toString().slice(-6)}`;
+    const requestNo = REQ-;
 
-    await db.query(`
-      INSERT INTO clearance_requests (request_no, employee_id, type, reason, urgency)
-      VALUES (?, ?, ?, ?, ?)
-    `, [requestNo, employeeId, type, reason, urgency || 'normal']);
-
-    // Send emails (non-blocking)
-    try {
-      const [empData] = await db.query(`
-        SELECT e.*, u.name, u.username FROM employees e
-        JOIN users u ON e.user_id = u.id WHERE e.id = ?
-      `, [employeeId]);
-      const empEmail = empData[0]?.email || '';
-      const empName  = empData[0]?.name  || 'Employee';
-
-      // Email to employee confirming submission
-      if (empEmail) email.sendRequestSubmitted(empEmail, empName, type, requestNo);
-
-      // Email to HR about new request
-      const HR_EMAIL = process.env.HR_EMAIL || '';
-      if (HR_EMAIL) email.sendNewRequestToHR(HR_EMAIL, empName, type, requestNo, urgency || 'normal');
-    } catch (emailErr) {
-      console.error('Email error (non-fatal):', emailErr.message);
-    }
+    await db.query(
+      INSERT INTO clearance_requests (request_no, employee_id, type, reason, urgency, approval_level)
+      VALUES (?, ?, ?, ?, ?, 'manager')
+    , [requestNo, employeeId, type, reason, urgency || 'normal']);
 
     res.json({ message: 'Request submitted successfully', request_no: requestNo });
   } catch (err) {
@@ -162,47 +141,103 @@ app.post('/api/requests', authMiddleware, async (req, res) => {
   }
 });
 
-// PATCH /api/requests/:id/status — approve or reject
-app.patch('/api/requests/:id/status', authMiddleware, async (req, res) => {
+// MULTI-LEVEL APPROVAL ENDPOINT (Manager -> HR -> Admin with Certificate)
+app.patch('/api/requests/:id/approve', authMiddleware, async (req, res) => {
   try {
-    const { status, review_note } = req.body;
-    await db.query(`
-      UPDATE clearance_requests
-      SET status = ?, reviewed_by = ?, review_note = ?
-      WHERE id = ?
-    `, [status, req.user.id, review_note || '', req.params.id]);
-    // Send email notification to employee
-    try {
-      const [reqData] = await db.query(`
-        SELECT cr.*, e.email, u.name, u.username
-        FROM clearance_requests cr
-        JOIN employees e ON cr.employee_id = e.id
-        JOIN users u ON e.user_id = u.id
-        WHERE cr.id = ?
-      `, [req.params.id]);
-      if (reqData.length > 0) {
-        const r = reqData[0];
-        if (r.email) {
-          if (status === 'approved') {
-            email.sendRequestApproved(r.email, r.name, r.type, r.request_no);
-          } else if (status === 'rejected') {
-            email.sendRequestRejected(r.email, r.name, r.type, r.request_no, review_note);
-          }
-        }
-      }
-    } catch (emailErr) {
-      console.error('Email error (non-fatal):', emailErr.message);
+    const { action, review_note } = req.body;
+    const userRole = req.user.role;
+    const requestId = req.params.id;
+    
+    const [requests] = await db.query('SELECT * FROM clearance_requests WHERE id = ?', [requestId]);
+    if (requests.length === 0) {
+      return res.status(404).json({ error: 'Request not found' });
     }
-
-    res.json({ message: `Request ${status} successfully` });
+    
+    const request = requests[0];
+    let currentLevel = request.approval_level || 'manager';
+    let newLevel = currentLevel;
+    let updateFields = {};
+    
+    if (userRole === 'manager' && currentLevel === 'manager') {
+      updateFields.manager_approved = action === 'approve';
+      updateFields.manager_approved_at = new Date();
+      newLevel = action === 'approve' ? 'hr' : 'rejected';
+    }
+    else if (userRole === 'hr' && currentLevel === 'hr') {
+      updateFields.hr_approved = action === 'approve';
+      updateFields.hr_approved_at = new Date();
+      newLevel = action === 'approve' ? 'admin' : 'rejected';
+    }
+    else if (userRole === 'admin' && currentLevel === 'admin') {
+      updateFields.admin_approved = action === 'approve';
+      updateFields.admin_approved_at = new Date();
+      newLevel = action === 'approve' ? 'completed' : 'rejected';
+      
+      if (action === 'approve') {
+        const certificateNumber = 'CERT-' + Date.now() + '-' + requestId;
+        const certificateUrl = https://employeesclearancesystem.onrender.com/certificates/;
+        updateFields.certificate_url = certificateUrl;
+        updateFields.certificate_generated_at = new Date();
+        updateFields.completed_at = new Date();
+      }
+    }
+    else {
+      return res.status(403).json({ 
+        error: Not authorized. Current level: , Your role:  
+      });
+    }
+    
+    await db.query(
+      UPDATE clearance_requests 
+      SET approval_level = ?,
+          status = ?,
+          manager_approved = ?,
+          manager_approved_at = ?,
+          hr_approved = ?,
+          hr_approved_at = ?,
+          admin_approved = ?,
+          admin_approved_at = ?,
+          certificate_url = ?,
+          certificate_generated_at = ?,
+          completed_at = ?,
+          review_note = ?
+      WHERE id = ?
+    , [
+      newLevel,
+      newLevel === 'completed' ? 'approved' : (newLevel === 'rejected' ? 'rejected' : 'pending'),
+      updateFields.manager_approved || false,
+      updateFields.manager_approved_at || null,
+      updateFields.hr_approved || false,
+      updateFields.hr_approved_at || null,
+      updateFields.admin_approved || false,
+      updateFields.admin_approved_at || null,
+      updateFields.certificate_url || null,
+      updateFields.certificate_generated_at || null,
+      updateFields.completed_at || null,
+      review_note || '',
+      requestId
+    ]);
+    
+    const response = {
+      message: Request d by ,
+      current_level: newLevel,
+      next_role: newLevel === 'hr' ? 'HR' : (newLevel === 'admin' ? 'Admin' : (newLevel === 'completed' ? 'Complete - Certificate Generated' : 'Rejected'))
+    };
+    
+    if (updateFields.certificate_url) {
+      response.certificate_url = updateFields.certificate_url;
+      response.certificate_number = updateFields.certificate_url.split('/').pop();
+    }
+    
+    res.json(response);
+    
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ─── EMPLOYEES ROUTES ─────────────────────────────────────────
-
-// GET /api/employees
+// Get employees
 app.get('/api/employees', authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM employees ORDER BY name');
@@ -212,55 +247,34 @@ app.get('/api/employees', authMiddleware, async (req, res) => {
   }
 });
 
-// POST /api/employees — add new employee
-app.post('/api/employees', authMiddleware, async (req, res) => {
-  try {
-    const { name, email, department, role } = req.body;
-    await db.query(
-      'INSERT INTO employees (name, email, department, role) VALUES (?, ?, ?, ?)',
-      [name, email, department, role]
-    );
-    res.json({ message: 'Employee added successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ─── STATS ROUTE ──────────────────────────────────────────────
-
-// GET /api/stats
+// Stats endpoint
 app.get('/api/stats', authMiddleware, async (req, res) => {
   try {
-    const [[{ total }]]      = await db.query('SELECT COUNT(*) AS total FROM clearance_requests');
-    const [[{ pending }]]    = await db.query("SELECT COUNT(*) AS pending FROM clearance_requests WHERE status='pending'");
-    const [[{ approved }]]   = await db.query("SELECT COUNT(*) AS approved FROM clearance_requests WHERE status='approved'");
-    const [[{ rejected }]]   = await db.query("SELECT COUNT(*) AS rejected FROM clearance_requests WHERE status='rejected'");
-    const [[{ employees }]]  = await db.query('SELECT COUNT(*) AS employees FROM employees');
-
+    const [[{ total }]] = await db.query('SELECT COUNT(*) AS total FROM clearance_requests');
+    const [[{ pending }]] = await db.query("SELECT COUNT(*) AS pending FROM clearance_requests WHERE status='pending'");
+    const [[{ approved }]] = await db.query("SELECT COUNT(*) AS approved FROM clearance_requests WHERE status='approved'");
+    const [[{ rejected }]] = await db.query("SELECT COUNT(*) AS rejected FROM clearance_requests WHERE status='rejected'");
+    const [[{ employees }]] = await db.query('SELECT COUNT(*) AS employees FROM employees');
     res.json({ total, pending, approved, rejected, employees });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ─── FEEDBACK ROUTE ───────────────────────────────────────────
-
-// POST /api/feedback
+// Feedback endpoints
 app.post('/api/feedback', authMiddleware, async (req, res) => {
   try {
     const { category, rating, comment, suggestion, anonymous } = req.body;
-    const user = req.user;
-    await db.query(`
+    await db.query(
       INSERT INTO feedback (submitted_by, role, category, rating, comment, suggestion, anonymous)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [anonymous ? 'Anonymous' : user.name, user.role, category, rating, comment, suggestion || '', anonymous]);
+    , [anonymous ? 'Anonymous' : req.user.name, req.user.role, category, rating, comment, suggestion || '', anonymous]);
     res.json({ message: 'Feedback submitted!' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/feedback
 app.get('/api/feedback', authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM feedback ORDER BY created_at DESC');
@@ -270,9 +284,14 @@ app.get('/api/feedback', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── START SERVER ─────────────────────────────────────────────
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'ECS Backend API', version: '2.0', endpoints: ['/api/auth/login', '/api/requests', '/api/stats'] });
+});
+
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 ECS Backend running on port ${PORT}`);
-  console.log(`📋 API ready at http://localhost:${PORT}/api`);
+  console.log(🚀 ECS Backend running on port );
+  console.log(📋 API ready at http://localhost:/api);
 });
