@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not set');
 const email = require('./emailService');
 
 const app = express();
@@ -40,7 +41,7 @@ const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token provided' });
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET || 'REMOVED');
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch {
     res.status(401).json({ error: 'Invalid token' });
@@ -60,7 +61,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role, name: user.name },
-      process.env.JWT_SECRET || 'REMOVED',
+      process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
 
