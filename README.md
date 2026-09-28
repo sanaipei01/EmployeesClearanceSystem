@@ -1,88 +1,85 @@
-Employee Clearance System (ECS)
+# Employee Clearance System (ECS)
 
 A full-stack web application for managing employee clearance requests with role-based access control. Built with React, Node.js, Express, and MySQL.
 
-What it does
+## What it does
 
-Employees can submit clearance requests, managers and HR can approve or reject them, and everyone receives email notifications. There are 4 dashboards — Admin, HR, Manager, and Employee — each showing recent activity with expandable sections.
+Employees submit clearance requests, managers and HR approve or reject them, and everyone receives email notifications. There are 4 dashboards (Admin, HR, Manager, Employee), each showing recent activity with expandable sections.
 
-Tech Stack
+## Tech Stack
 
-Frontend — React 18, React Router, CSS3
+- Frontend: React 18, React Router, CSS3
+- Backend: Node.js, Express.js
+- Database: MySQL
+- Auth: JWT, Bcrypt
+- Email: Nodemailer (Gmail)
 
-Backend — Node.js, Express.js
+## Features
 
-Database — MySQL
+- Role-based login (Admin, HR, Manager, Employee)
+- Submit and track clearance requests
+- Approve / reject workflow with email notifications
+- Downloadable clearance certificates
+- AI chatbot assistant
+- Resignation form (4 steps)
+- Feedback and star ratings
+- Mobile responsive
+- Dark and light mode support
 
-Auth — JWT, Bcrypt
+## Getting Started
 
-Email — Nodemailer (Gmail)
-
-Features
-
-Role-based login (Admin, HR, Manager, Employee)
-
-Submit and track clearance requests
-
-Approve / reject workflow with email notifications
-
-Downloadable clearance certificates
-
-AI chatbot assistant
-
-Resignation form (4 steps)
-
-Feedback and star ratings
-
-Mobile responsive
-
-Dark and light mode support
-
-Getting Started
 1. Clone the repo
-git clone https://github.com/sanaipei01/EmployeesClearanceSystem.git
-cd EmployeesClearanceSystem
+
+       git clone https://github.com/sanaipei01/EmployeesClearanceSystem.git
+       cd EmployeesClearanceSystem
+
 2. Set up the database
-mysql -u root -p < database/setup.sql
-3. Set up environment variables
 
-Copy .env.example to .env in the backend/ folder and fill in your secrets:
+       mysql -u root -p < database/setup.sql
 
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=<your_mysql_password>
-DB_NAME=ecs_db
-JWT_SECRET=<your_jwt_secret_key>
-PORT=5000
-EMAIL_USER=<your_email>
-EMAIL_PASS=<your_email_app_password>
-HR_EMAIL=<hr_email>
+3. Set up environment variables. Copy `backend/.env.example` to `backend/.env` and fill in your own values:
 
-.env is not tracked in Git. Do not commit your real secrets.
+       DB_HOST=localhost
+       DB_USER=<your_mysql_user>
+       DB_PASSWORD=<your_mysql_password>
+       DB_NAME=ecs_db
+       JWT_SECRET=<any_long_random_string>
+       PORT=5000
+       EMAIL_USER=<your_email>
+       EMAIL_PASS=<your_email_app_password>
+       HR_EMAIL=<hr_email>
+       SEED_ADMIN_PASSWORD=<choose_a_demo_password>
+       SEED_HR_PASSWORD=<choose_a_demo_password>
+       SEED_MANAGER_PASSWORD=<choose_a_demo_password>
+       SEED_EMPLOYEE_PASSWORD=<choose_a_demo_password>
 
-4. Run the backend
-cd backend
-npm install
-npm run dev
-5. Run the frontend
-cd frontend
-npm install
-npm start
-Login Credentials
-Role	Username	Password
-Admin	admin	<contact developer>
-HR	hr	<contact developer>
-Manager	manager	<contact developer>
-Employee	employee	<contact developer>
+   `.env` is not tracked in Git. Never commit real secrets.
 
-To get login credentials contact: sanaipeitenkes@gmail.com
+4. Create tables and seed the default users
 
-Developer
+       cd backend
+       npm install
+       node migrate.js
 
-Sanaipei Tenkes
-BSc Software Engineering — USIU Africa (2023–2027)
-📧 sanaipeitenkes@gmail.com
+5. Run the backend
 
-🐙 github.com/sanaipei01
+       npm run dev
 
-📍 Nairobi, Kenya
+6. Run the frontend (in a second terminal)
+
+       cd frontend
+       npm install
+       npm start
+
+## Logging in
+
+Seeded usernames: `admin`, `hr`, `manager`, `employee`. Each password is whatever you set in the matching `SEED_*_PASSWORD` variable. There are no shared default credentials. For a hosted demo login, contact sanaipeitenkes@gmail.com.
+
+## Screenshots
+
+Coming soon (docs/screenshots/).
+
+## Developer
+
+Sanaipei Tenkes, BSc Software Engineering, USIU Africa (2023-2027)
+GitHub: github.com/sanaipei01 | Nairobi, Kenya | sanaipeitenkes@gmail.com

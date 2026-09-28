@@ -4,3 +4,7 @@ backend/node_modules/
 frontend/node_modules/
 # Local Netlify folder
 .netlify
+
+backend/.env
+frontend/build/
+replacements.txt

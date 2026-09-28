@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+const seed = (n) => process.env[n] || crypto.randomBytes(12).toString('base64url');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
@@ -85,10 +87,10 @@ async function migrate() {
 
   console.log('\n🔄 Creating default users...');
 
-  const adminPassword = await bcrypt.hash('REMOVED', 7);
-  const hrPassword = await bcrypt.hash('REMOVED', 7);
-  const managerPassword = await bcrypt.hash('REMOVED', 7);
-  const employeePassword = await bcrypt.hash('REMOVED', 7);
+  const adminPassword = await bcrypt.hash(seed('SEED_ADMIN_PASSWORD'), 12);
+  const hrPassword = await bcrypt.hash(seed('SEED_HR_PASSWORD'), 12);
+  const managerPassword = await bcrypt.hash(seed('SEED_MANAGER_PASSWORD'), 12);
+  const employeePassword = await bcrypt.hash(seed('SEED_EMPLOYEE_PASSWORD'), 12);
 
   // Insert admin
   await db.query(`
@@ -143,10 +145,6 @@ async function migrate() {
 
   console.log('\n🎉🎉🎉 DATABASE MIGRATION COMPLETE! 🎉🎉🎉');
   console.log('\nDefault login credentials:');
-  console.log('  admin:    REMOVED');
-  console.log('  hr:       REMOVED');
-  console.log('  manager:  REMOVED');
-  console.log('  employee: REMOVED');
   
   await db.end();
   process.exit(0);
